@@ -45,9 +45,12 @@ def maps_commune():
             with tab1:
                 if 'Tous les sports' in sport_list:
                     sport_list = sport_options
+                    graph_height = 2000
+                else:
+                    graph_height = 800
 
                 df_licencies_par_code, df_licencies_par_fed, df_equip_f, cities_f = get_df_for_maps(sport_list, dep, commune_code_list, entire_dep=False)
-                fig = display_licencies_barh(df_licencies_par_fed)
+                fig = display_licencies_barh(df_licencies_par_fed, graph_height)
                 st.plotly_chart(fig)
 
             with tab2:

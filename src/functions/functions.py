@@ -36,10 +36,10 @@ def display_licencies_plotline(df, sport, dep):
 
     return fig 
 
-def display_licencies_barh(df):
+def display_licencies_barh(df, graph_height):
 
     df = df.sort_values(by = 'nb_licencies')
-    fig = px.bar(df, y="Fédération", x="nb_licencies", orientation='h', color='Commune', width=800, height=800)
+    fig = px.bar(df, y="Fédération", x="nb_licencies", orientation='h', color='Commune', width=800, height=graph_height, text_auto=True)
     fig.update_xaxes(automargin=True)
 
     fig.update_layout(

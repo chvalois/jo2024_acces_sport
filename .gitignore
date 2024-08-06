@@ -1,4 +1,4 @@
-/data/raw
+/data/raw/*.csv
 /venv
 /notebook
 

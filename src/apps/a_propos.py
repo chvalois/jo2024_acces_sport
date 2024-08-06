@@ -34,7 +34,7 @@ def a_propos():
         * Quel est la répartition de l'âge des licenciés sportifs chez les hommes et les femmes pour un sport donné ?
     """)
     
-    st.write("**Ce projet est un travail en cours de réalisation, il ne contient donc pas encore tous les éléments permettant d'adresser l'intégralité de la problématique posée par le challenge.**")
+    st.write("**Ce projet est un travail en cours de réalisation, il ne contient donc pas encore tous les éléments permettant d'adresser l'intégralité de la problématique posée par le challenge, et notamment des recommandations.**")
 
     st.divider()
 

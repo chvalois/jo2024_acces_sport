@@ -18,6 +18,8 @@ def maps_commune():
     st.title('Pratique du sport dans ma commune')
     st.write('Données 2021')
 
+    st.markdown(":bulb: Cet écran permet de visualiser les statistiques sur une ou plusieurs communes")
+
     with st.container(border=True):
         col1, col2 = st.columns(2)
         with col1:

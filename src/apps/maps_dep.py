@@ -18,6 +18,8 @@ def maps_dep():
     st.title('Pratique du sport dans le département')
     st.write('Données 2021')
 
+    st.markdown(":bulb: Cet écran permet de visualiser la répartition H/F et par tranche d'âge des licenciés, et d'afficher sur une cartographie des détails sur la pratique du sport sélectionné dans les communes du département")
+
     with st.form('maps_dep'):
         col1, col2 = st.columns(2)
         with col1:

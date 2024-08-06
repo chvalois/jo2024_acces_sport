@@ -16,6 +16,8 @@ def barh_analysis():
     st.title('Statistiques des licenciés par fédération')
     st.write('Données 2021')
 
+    st.markdown(":bulb: Cet écran permet de visualiser les statistiques comme par exemple le **pourcentage de femmes licenciées** par fédération sportive")
+
     with st.form('barh_form'):
         col1, col2 = st.columns(2)
         with col1:

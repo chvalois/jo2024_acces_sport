@@ -4,7 +4,7 @@ import geopandas as gpd
 import folium
 from folium import plugins
 import geopandas as gpd
-from src.functions.functions import get_mappings, get_colors_mapping, get_dep_centroid, get_column_mapping
+from src.functions.functions import get_mappings, get_colors_mapping, get_dep_centroid, get_column_mapping, pivot_lic_df
 
 
 def display_france_map(fed, stat, qpv):

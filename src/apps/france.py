@@ -22,6 +22,8 @@ def france():
     st.title('Sportifs licenciés en France')
     st.write('Données 2021')
 
+    st.markdown(":bulb: Cet écran permet de visualiser sur une cartographie des statistiques sur la pratique des licenciés en France métropolitaine par département")
+
     with st.form('france'):
         col1, col2 = st.columns(2)
         with col1:
@@ -29,7 +31,7 @@ def france():
 
         with col2:
             stat = st.selectbox("Choisir une statistique", stat_options)
-        qpv = st.checkbox("Afficher les statistiques dans les QPV seulement")
+        qpv = st.checkbox("Afficher les statistiques dans les QPV seulement", help = "QPV = Quartiers Prioritaires de la Politique de la Ville")
         submitted = st.form_submit_button("Valider")
 
     if submitted:

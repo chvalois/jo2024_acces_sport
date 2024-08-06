@@ -28,7 +28,8 @@ def a_propos():
         * Quelles communes présentent le plus fort taux de licenciés parmi la population dans tel sport ?
         * Où sont les infrastructures sportives dans ma commune ?
         * Combien de licenciés y a t-il dans chaque commune de mon département ?
-    * Inégalités sociales 
+    * Inégalités sociales
+        * Dans quels départements y a t-il le plus de licenciés handisport ?
         * Quelles sont les fédérations sportives où la part de femmes licenciées est la plus faible ? 
         * Quel est la répartition de l'âge des licenciés sportifs chez les hommes et les femmes pour un sport donné ?
     """)

@@ -2,7 +2,7 @@ import streamlit as st
 
 def a_propos():
 
-    st.title('A propos')
+    st.title('A propos de Sportoo')
     st.write("Ce projet de data visualisation a été réalisé dans le cadre du challenge 'Accès au sport' posté sur le site https://defis.data.gouv.fr/")
 
     st.divider()
@@ -25,7 +25,7 @@ def a_propos():
     st.markdown("""
     * Inégalités territoriales via la visualisation des infrastructures sportives sur une cartographie
         * L'accès au sport est-il possible partout dans mon département ?
-        * Quelles ommunes présentent le plus fort taux de licenciés parmi la population dans tel sport ?
+        * Quelles communes présentent le plus fort taux de licenciés parmi la population dans tel sport ?
         * Où sont les infrastructures sportives dans ma commune ?
         * Combien de licenciés y a t-il dans chaque commune de mon département ?
     * Inégalités sociales 

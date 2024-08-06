@@ -20,7 +20,6 @@ def france():
                     "Pourcentage d'hommes licenciés"]
 
     st.title('Sportifs licenciés en France')
-    st.write('Données 2021')
 
     st.markdown(":bulb: Cet écran permet de visualiser sur une cartographie des statistiques sur la pratique des licenciés en France métropolitaine par département")
 

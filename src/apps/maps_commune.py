@@ -16,7 +16,6 @@ def maps_commune():
     dep_options = get_dep_list(include_all=False)
 
     st.title('Pratique du sport dans ma commune')
-    st.write('Données 2021')
 
     st.markdown(":bulb: Cet écran permet de visualiser les statistiques sur une ou plusieurs communes")
 

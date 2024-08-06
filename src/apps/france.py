@@ -42,8 +42,3 @@ def france():
 
             m = display_france_map(fed, stat, qpv)
             folium_static(m, height = 750)
-
-
-
-if __name__ == '__main__':
-    france()

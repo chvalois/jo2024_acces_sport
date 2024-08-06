@@ -47,5 +47,3 @@ def maps_dep():
                     st.subheader(f"Nb licenciés vs. Infrastructures | {sport} | Département {dep}")
                     folium_static(m)
 
-if __name__ == '__main__':
-    maps_dep()

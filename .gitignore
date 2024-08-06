@@ -1,4 +1,6 @@
 /data/raw
 /venv
-/venv_windows
 /notebook
+
+/venv_windows
+/venv**

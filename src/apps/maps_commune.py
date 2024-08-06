@@ -56,5 +56,3 @@ def maps_commune():
                 st.subheader(f"Nb licenciés vs. Infrastructures | Département {dep}")
                 folium_static(m)
                
-if __name__ == '__main__':
-    maps_commune()

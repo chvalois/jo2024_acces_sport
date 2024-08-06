@@ -31,7 +31,3 @@ def barh_analysis():
             st.subheader(f"{stat} par fédération")
             fig = display_barh(stat, dep, qpv)
             st.plotly_chart(fig)
-
-
-if __name__ == '__main__':
-    france()

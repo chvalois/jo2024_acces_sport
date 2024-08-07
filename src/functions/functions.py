@@ -1,6 +1,9 @@
 import pandas as pd
 import polars as pl
 import plotly.express as px
+import geopandas as gpd
+from shapely.geometry import Point
+
 
 def transform_licencies_for_map(df_licencies, fed_list, dep):
     licencies_f = df_licencies[(df_licencies['Fédération'].isin(fed_list)) & (df_licencies['Département'] == int(dep))]
@@ -69,10 +72,16 @@ def get_dep_list(include_all):
 
 def get_commune_list(dep):
     
-    df = pd.read_csv('data/transformed/mapping_dep_communes.csv')
+    df = pd.read_csv('data/transformed/mapping_dep_communes.csv', dtype = {'code_commune': str})
     df = df[df['dep'] == dep]
+
     df = df.dropna()
     return df
+
+def get_commune_code_list(commune_df, commune_list):
+
+    commune_code_list = commune_df[commune_df['commune'].isin(commune_list)]['code_commune'].to_list()
+    return commune_code_list
 
 def get_dep_centroid(dep):
     df = pd.read_csv('data/transformed/dep_centroids.csv')
@@ -166,7 +175,7 @@ def transform_pop_df():
     pop = pd.read_csv('data/raw/base-cc-evol-struct-pop-2021.csv', delimiter = ';', dtype = {'CODGEO': str})
     pop = pop[['CODGEO', 'P21_POP']]
     pop = pop.rename({'CODGEO': 'code', 'P21_POP': 'nb_habitants'})
-    pop.to_parquet('../data/transformed/population_2021.parquet')
+    pop.to_parquet('data/transformed/population_2021.parquet')
 
 
 def transform_licencies_df():
@@ -194,7 +203,7 @@ def transform_licencies_df():
 
     # Calcul du dataframe Nb licenciés par Fédération et Département en fonction du sexe
     df_agg = df_agg.groupby(['Département', 'Fédération', 'QPV_or_not', 'sexe'])['value'].sum().reset_index()
-    df_agg.to_parquet('../data/transformed/lic-data-2021_details_agg_hf.parquet')
+    df_agg.to_parquet('data/transformed/lic-data-2021_details_agg_hf.parquet')
 
 
 def transform_equip_sportif_df():
@@ -219,9 +228,6 @@ def transform_equip_sportif_df():
          'inst_com_nom',
          'inst_actif',
          'inst_etat',
-         'inst_date_creation',
-         'inst_date_etat',
-         'inst_date_valid',
          'inst_acc_handi_bool',
          'inst_part_type_filter',
          'equip_numero',
@@ -236,6 +242,8 @@ def transform_equip_sportif_df():
          'equip_pmr_acc',
          'equip_surf',
          'equip_service_date',
+         'equip_service_periode',
+         'equip_travaux_periode',
          'equip_aps_code',
          'equip_aps_nom',
          'epci_nom',
@@ -244,4 +252,66 @@ def transform_equip_sportif_df():
          'dens_niveau',
          'dens_lib']]
 
+    df['equip_service_periode'] = df['equip_service_periode'].fillna('Aucune date disponible')
+    df['equip_travaux_periode'] = df['equip_travaux_periode'].fillna('Aucun travaux')
+
+    mapping_periodes = {
+        'Avant 1945': '0_avant 1945',
+        '1945 - 1964': '1945-1964',
+        '1945-1964': '1945-1964',
+        '1965 - 1974': '1965-1974',
+        '1965-1974': '1965-1974',
+        '1975 - 1984': '1975-1984', 
+        '1975-1984': '1975-1984', 
+        '1985 - 1994': '1985-1994',
+        '1985-1994': '1985-1994', 
+        '1995 - 2004': '1995-2004',
+        '1995-2004': '1995-2004', 
+        'A partir de 2005': '2005 et après',
+        'Avant 1975': '0_avant 1975',
+        'Aucun travaux': 'Aucun travaux',
+        'Aucune date disponible': 'Aucune date disponible',
+        None: None
+    }
+
+    df['equip_service_periode'] = df['equip_service_periode'].apply(lambda x: mapping_periodes[x])
+    df['equip_travaux_periode'] = df['equip_travaux_periode'].apply(lambda x: mapping_periodes[x])
+
     df.to_parquet('data/transformed/equip_es.parquet')
+
+
+def create_mapping_idcarnat_dep():
+    
+    # Récupération des identifiants de carreaux
+    df = gpd.read_file('data/raw/carreaux_nivNaturel_met.gpkg')
+    df = df[['idcar_nat']]
+    df['coord_N'] = df['idcar_nat'].str[-15:-8]
+    df['coord_E'] = df['idcar_nat'].str[-7:]
+
+    # Transformation des identifiants en coordonnées GPS WGS84
+    df_mapping_idcarnat = df[['idcar_nat', 'coord_N', 'coord_E']]
+    df_mapping_idcarnat['geometry'] = df_mapping_idcarnat.apply(lambda x: Point(x['coord_E'], x['coord_N']), axis = 1)
+    df_mapping_idcarnat = gpd.GeoDataFrame(df_mapping_idcarnat[['idcar_nat', 'coord_N', 'coord_E', 'geometry']], crs="EPSG:3035")
+    df_mapping_idcarnat = df_mapping_idcarnat.to_crs('epsg:4326')
+
+    # Chargement des départements au format geojson
+    dep_geojson = gpd.read_file('data/raw/departements.geojson')
+
+    # Jointure géospatiale permettant de faire le croisement entre coordonnées des carreaux et limites des départements
+    df_mapping_idcarnat = gpd.sjoin(df_mapping_idcarnat, dep_geojson, how='left', predicate='within')
+
+    # Enregistrement au format parquet
+    df_mapping_idcarnat.to_parquet('data/transformed/mapping_idcarnat_dep.parquet')
+
+
+def concat_communes_arr_geojson():
+    communes_geojson = gpd.read_file('data/raw/communes.geojson')
+    marseille_geojson = gpd.read_file('data/raw/communes-13-bouches-du-rhone.geojson')
+    lyon_geojson = gpd.read_file('data/raw/communes-69-rhone.geojson')
+    paris_geojson = gpd.read_file('data/raw/communes-75-paris.geojson')
+
+    marseille_geojson = marseille_geojson[marseille_geojson['code'].str.startswith('132')]
+    lyon_geojson = lyon_geojson[lyon_geojson['code'].str.startswith('693')]
+
+    communes_with_arr_geojson = gpd.GeoDataFrame(pd.concat([communes_geojson, paris_geojson, lyon_geojson, marseille_geojson], ignore_index=True))
+    communes_with_arr_geojson.to_file('data/transformed/communes_with_arr.geojson', driver='GeoJSON')

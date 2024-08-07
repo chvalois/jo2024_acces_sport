@@ -2,7 +2,7 @@ import streamlit as st
 from folium import plugins
 from streamlit_folium import folium_static
 from src.functions.map_functions import get_map_allsports, get_df_for_maps, get_a_map
-from src.functions.functions import get_dep_list, get_commune_list, get_mappings, display_licencies_barh
+from src.functions.functions import get_dep_list, get_commune_list, get_mappings, display_licencies_barh, get_commune_code_list
 
 def maps_commune():
 
@@ -26,8 +26,8 @@ def maps_commune():
         with col2:
             dep = st.selectbox("Choisir un département", dep_options)
             commune_df = get_commune_list(dep)
-            commune_options = sorted(commune_df['commune'].to_list())
-            commune_list = st.multiselect("Choisir une ou plusieurs communes", commune_options, max_selections=5)
+            commune_options = sorted(list(set(commune_df['commune'])))
+            commune_list = st.multiselect("Choisir une ou plusieurs communes", commune_options, max_selections=10)
         
         map_type = st.selectbox("Colorer la cartographie en fonction de", ['Nombre de licenciés', 'Ratio Nb licenciés / Nb habitants'])
         
@@ -37,7 +37,8 @@ def maps_commune():
         if commune_list == []:
             st.write("Veuillez sélectionner au moins une commune")
 
-        commune_code_list = commune_df[commune_df['commune'].isin(commune_list)]['code_commune'].to_list()
+        commune_code_list = get_commune_code_list(commune_df, commune_list)
+        print(commune_code_list)
 
         tab1, tab2 = st.tabs(["📈 Pratique des sports sélectionnés", "🗺️ Cartographie"])
         with st.spinner('Veuillez patienter ...'):

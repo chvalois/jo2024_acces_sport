@@ -153,12 +153,12 @@ def get_a_map(dep, map_type, df_equip_f, cities_f):
     return m
 
 
-def get_df_for_maps(sport_list, dep, commune_list, entire_dep = True):
+def get_df_for_maps(sport_list, dep, commune_code_list, entire_dep = True):
 
     # Import dataframes
     df_equip = pl.read_parquet('data/transformed/equip_es.parquet')
     df_licencies = pl.read_parquet('data/transformed/lic-data-2021_total.parquet')
-    cities_geojson = gpd.read_file('data/raw/communes.geojson')
+    cities_geojson = gpd.read_file('data/transformed/communes_with_arr.geojson')
     df_pop = pd.read_parquet('data/transformed/population_2021.parquet')
 
     # Get mappings
@@ -170,7 +170,7 @@ def get_df_for_maps(sport_list, dep, commune_list, entire_dep = True):
     if entire_dep == True:
         condition = (pl.col("equip_type_name").is_in(equip_type_list)) & (pl.col("dep_code_filled") == dep)
     else:
-        condition = (pl.col("equip_type_name").is_in(equip_type_list)) & (pl.col("inst_com_code").is_in(commune_list))
+        condition = (pl.col("equip_type_name").is_in(equip_type_list)) & (pl.col("inst_com_code").is_in(commune_code_list))
 
     df_equip_f = df_equip.filter(condition).to_pandas()
 
@@ -178,7 +178,7 @@ def get_df_for_maps(sport_list, dep, commune_list, entire_dep = True):
     if entire_dep == True:
         condition = (pl.col('Fédération').is_in(fed_list)) & (pl.col("Département") == dep)
     else:
-        condition = (pl.col('Fédération').is_in(fed_list)) & (pl.col("code").is_in(commune_list))
+        condition = (pl.col('Fédération').is_in(fed_list)) & (pl.col("code").is_in(commune_code_list))
 
     df_licencies = df_licencies.filter(condition)
     df_licencies_par_code = df_licencies.group_by(['code'], maintain_order=True).agg(pl.sum("nb_licencies")).to_pandas()
@@ -188,7 +188,7 @@ def get_df_for_maps(sport_list, dep, commune_list, entire_dep = True):
     if entire_dep == True:
         cities_f = cities_geojson[cities_geojson['code'].str.startswith(dep)]
     else:
-        cities_f = cities_geojson[cities_geojson['code'].isin(commune_list)]
+        cities_f = cities_geojson[cities_geojson['code'].isin(commune_code_list)]
     
     cities_f = cities_f.merge(df_licencies_par_code[['code', 'nb_licencies']], on = 'code', how = 'left')
     cities_f = cities_f.merge(df_pop[['code', 'nb_habitants']], on = 'code', how = 'left')

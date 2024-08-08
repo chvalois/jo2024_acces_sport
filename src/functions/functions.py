@@ -132,8 +132,34 @@ def get_colors_mapping(type):
             False: 'red'
             }
     
+    elif type in ['equip_service_periode', 'equip_travaux_periode']:
+        color_mapping = {
+            'Aucune date disponible': 'gray',
+            'Aucun travaux': 'gray',
+            '0_avant 1945': 'darkred',
+            '1945-1964': 'red',
+            '1965-1974': 'orange',
+            '0_avant 1975': 'darkred',
+            '1975-1984': 'beige',
+            '1985-1994': 'lightgreen',
+            '1995-2004': 'green',
+            '2005 et après' : 'darkgreen'
+            }
+
     return(color_mapping)
 
+def get_markers_html(df, marker_field, color_mapping):
+    markers_value = sorted(list(set(df[marker_field])))
+    html_markers = ""
+    for marker in markers_value:
+        color = color_mapping.get(marker)
+        if marker == True:
+            marker = "Oui"
+        elif marker == False: 
+            marker = "Non"
+        html_markers += f"<i style='color:{color}; font-size:16px>'>&#9679;</i> {marker}<br>"
+
+    return html_markers
 
 def pivot_lic_df_genre():
     # Load dataframe

@@ -7,7 +7,7 @@ from src.apps.a_propos import a_propos
 
 from streamlit_option_menu import option_menu
 
-st.set_page_config(page_title="Sportoo - Sport Data Viz", page_icon=":checkered_flag:", layout="centered", initial_sidebar_state="auto", menu_items=None)
+st.set_page_config(page_title="Sportoo - Sport Data Viz", page_icon=":checkered_flag:", layout="wide", initial_sidebar_state="auto", menu_items=None)
 
 def main():
 

@@ -27,7 +27,8 @@ def maps_dep():
             dep = st.selectbox("Choisir un département", dep_options)
         
         map_type = st.selectbox("Colorer la cartographie en fonction de", ['Nombre de licenciés', 'Ratio Nb licenciés / Nb habitants'])
-        marker_type = st.selectbox("Colorer les marqueurs de cartographie en fonction du", ['Accès aux personnes en situation de handicap', 'Accès PMR', 'Infrastructure équipée de douches', 'Infrastructure équipée de sanitaires', "Sport pratiqué dans l'infrastructure"])
+        marker_type = st.selectbox("Colorer les marqueurs de cartographie en fonction du", ['Accès aux personnes en situation de handicap', 'Accès PMR', 'Infrastructure équipée de douches', 'Infrastructure équipée de sanitaires', "Sport pratiqué dans l'infrastructure", 
+                                                                                            "Période de mise en service", "Période des derniers travaux"])
         submitted = st.form_submit_button("Valider")
 
     if submitted:
@@ -42,7 +43,7 @@ def maps_dep():
                 plugins.Fullscreen().add_to(m)
 
                 st.subheader(f"Nb licenciés vs. Infrastructures | {sport} | Département {dep}")
-                folium_static(m)                
+                folium_static(m, width=1200, height=800)                
 
             with tab2:
                 st.subheader(f"Nb licenciés | {sport} | Département {dep}")

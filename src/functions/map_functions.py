@@ -4,7 +4,8 @@ import geopandas as gpd
 import folium
 from folium import plugins
 import geopandas as gpd
-from src.functions.functions import get_mappings, get_colors_mapping, get_dep_centroid, get_column_mapping, get_lic_stat_df
+from src.functions.functions import get_mappings, get_colors_mapping, get_dep_centroid, get_column_mapping, get_lic_stat_df, get_markers_html
+from src.functions import create_legend
 
 
 def display_france_map(fed, stat, qpv):
@@ -73,7 +74,6 @@ def display_france_map(fed, stat, qpv):
         )
     ).add_to(m)
 
-
     # Display the map
     # Activer le bouton fullscreen sur Folium
     plugins.Fullscreen().add_to(m)
@@ -99,6 +99,8 @@ def get_a_map(dep, map_type, df_equip_f, cities_f, marker_type):
                                 Accès PMR : {'Oui' if x['equip_pmr_acc'] == True else 'Non' if x['equip_pmr_acc'] == False else 'Non défini'} <br/> \
                                 Infrastructure équipée de douches : {'Oui' if x['equip_sanit'] == True else 'Non' if x['equip_sanit'] == False else 'Non défini'} <br/> \
                                 Sport pratiqué dans l'infrastructure : {'Oui' if x['equip_type_name'] == True else 'Non' if x['equip_type_name'] == False else 'Non défini'} <br/> \
+                                Période de mise en service : {x['equip_service_periode']} <br/> \
+                                Période des derniers travaux : {x['equip_travaux_periode']} <br/> \
                                 {'En activité : Oui' if x['inst_actif'] else 'En activité : Non'}", axis = 1)
                                    
     # Add the choropleth layer
@@ -113,7 +115,9 @@ def get_a_map(dep, map_type, df_equip_f, cities_f, marker_type):
                       "Accès PMR": 'equip_pmr_acc', 
                       "Infrastructure équipée de douches": 'equip_douche', 
                       "Infrastructure équipée de sanitaires": 'equip_sanit', 
-                      "Sport pratiqué dans l'infrastructure": 'equip_type_name'}
+                      "Sport pratiqué dans l'infrastructure": 'equip_type_name', 
+                      "Période de mise en service": 'equip_service_periode',
+                      "Période des derniers travaux": 'equip_travaux_periode'}
 
     marker_field = marker_mapping[marker_type]
 
@@ -163,9 +167,17 @@ def get_a_map(dep, map_type, df_equip_f, cities_f, marker_type):
         folium.Marker(location=[equipment['equip_y'], equipment['equip_x']],
                     popup=popup,
                     icon=folium.Icon(color=color)).add_to(m)
-        
+
+
+    # Add a custom legend (HTML)
+    html_markers = get_markers_html(df_equip_f, marker_field, color_mapping)
+    m = create_legend.run(m, f"Infrastructures sportives vs. Licenciés | Département {dep}", marker_type, html_markers)
+
     # Add layer control
-    folium.LayerControl().add_to(m)
+    # folium.LayerControl().add_to(m)
+
+    # Add fullscreen
+    # plugins.Fullscreen().add_to(m)
 
     # Save the map to an HTML file
     m.save('map.html')
@@ -271,6 +283,8 @@ def get_map(sport, dep, map_type, marker_type):
                                 Accès PMR : {'Oui' if x['equip_pmr_acc'] == True else 'Non' if x['equip_pmr_acc'] == False else 'Non défini'} <br/> \
                                 Infrastructure équipée de douches : {'Oui' if x['equip_sanit'] == True else 'Non' if x['equip_sanit'] == False else 'Non défini'} <br/> \
                                 Sport pratiqué dans l'infrastructure : {'Oui' if x['equip_type_name'] == True else 'Non' if x['equip_type_name'] == False else 'Non défini'} <br/> \
+                                Période de mise en service : {x['equip_service_periode']} <br/> \
+                                Période des derniers travaux : {x['equip_travaux_periode']} <br/> \
                                 {'En activité : Oui' if x['inst_actif'] else 'En activité : Non'}", axis = 1)
                                    
 
@@ -284,8 +298,10 @@ def get_map(sport, dep, map_type, marker_type):
                       "Accès PMR": 'equip_pmr_acc', 
                       "Infrastructure équipée de douches": 'equip_douche', 
                       "Infrastructure équipée de sanitaires": 'equip_sanit', 
-                      "Sport pratiqué dans l'infrastructure": 'equip_type_name'}
-
+                      "Sport pratiqué dans l'infrastructure": 'equip_type_name', 
+                      "Période de mise en service": 'equip_service_periode',
+                      "Période des derniers travaux": 'equip_travaux_periode'}
+    
     marker_field = marker_mapping[marker_type]
 
     color_mapping = get_colors_mapping(marker_field)
@@ -335,9 +351,18 @@ def get_map(sport, dep, map_type, marker_type):
         folium.Marker(location=[equipment['equip_y'], equipment['equip_x']],
                     popup=popup,
                     icon=folium.Icon(color=color)).add_to(m)
-        
+
+
+
+    # Add a custom legend (HTML)
+    html_markers = get_markers_html(df_equip_f, marker_field, color_mapping)
+    m = create_legend.run(m, f"Infrastructures sportives vs. Licenciés | {sport} | Département {dep}", marker_type, html_markers)
+
     # Add layer control
-    folium.LayerControl().add_to(m)
+    # folium.LayerControl().add_to(m)
+
+    # Add fullscreen
+    # plugins.Fullscreen().add_to(m)
 
     # Save the map to an HTML file
     m.save('map.html')

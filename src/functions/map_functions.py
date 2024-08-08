@@ -4,7 +4,7 @@ import geopandas as gpd
 import folium
 from folium import plugins
 import geopandas as gpd
-from src.functions.functions import get_mappings, get_colors_mapping, get_dep_centroid, get_column_mapping, pivot_lic_df_genre, pivot_lic_df_age, get_lic_stat_df
+from src.functions.functions import get_mappings, get_colors_mapping, get_dep_centroid, get_column_mapping, get_lic_stat_df
 
 
 def display_france_map(fed, stat, qpv):
@@ -79,7 +79,7 @@ def display_france_map(fed, stat, qpv):
     plugins.Fullscreen().add_to(m)
     return(m)
 
-def get_a_map(dep, map_type, df_equip_f, cities_f):
+def get_a_map(dep, map_type, df_equip_f, cities_f, marker_type):
 
     # Convert the GeoDataFrame to a GeoJSON
     geojson_data = cities_f.to_json()
@@ -95,6 +95,10 @@ def get_a_map(dep, map_type, df_equip_f, cities_f):
     df_equip_f['label_html'] = df_equip_f.apply(lambda x: f"<b>{x['inst_nom']} - {x['equip_nom']}</b><br/> \
                                 {x['equip_type_famille']} > {x['equip_type_name']} <br/> \
                                 {x['inst_adresse']} {x['inst_cp']} {x['inst_com_nom']} <br/> \
+                                Accès aux personnes en situation de handicap : {'Oui' if x['inst_acc_handi_bool'] == True else 'Non' if x['inst_acc_handi_bool'] == False else 'Non défini'} <br/> \
+                                Accès PMR : {'Oui' if x['equip_pmr_acc'] == True else 'Non' if x['equip_pmr_acc'] == False else 'Non défini'} <br/> \
+                                Infrastructure équipée de douches : {'Oui' if x['equip_sanit'] == True else 'Non' if x['equip_sanit'] == False else 'Non défini'} <br/> \
+                                Sport pratiqué dans l'infrastructure : {'Oui' if x['equip_type_name'] == True else 'Non' if x['equip_type_name'] == False else 'Non défini'} <br/> \
                                 {'En activité : Oui' if x['inst_actif'] else 'En activité : Non'}", axis = 1)
                                    
     # Add the choropleth layer
@@ -105,8 +109,16 @@ def get_a_map(dep, map_type, df_equip_f, cities_f):
     else:
         heatmap_field = 'pct_licencies'
 
-    color_mapping = get_colors_mapping()
+    marker_mapping = {"Accès aux personnes en situation de handicap": 'inst_acc_handi_bool',
+                      "Accès PMR": 'equip_pmr_acc', 
+                      "Infrastructure équipée de douches": 'equip_douche', 
+                      "Infrastructure équipée de sanitaires": 'equip_sanit', 
+                      "Sport pratiqué dans l'infrastructure": 'equip_type_name'}
 
+    marker_field = marker_mapping[marker_type]
+
+    color_mapping = get_colors_mapping(marker_field)
+    
     folium.Choropleth(
         geo_data=geojson_data,
         name='choropleth',
@@ -146,9 +158,8 @@ def get_a_map(dep, map_type, df_equip_f, cities_f):
                      max_height=100,
                      max_width=500)
         
-        equipment_type = equipment['equip_type_name']
-        color = color_mapping.get(equipment_type, 'black')
-        print(color)
+        color = color_mapping.get(equipment[marker_field], 'gray')
+
         folium.Marker(location=[equipment['equip_y'], equipment['equip_x']],
                     popup=popup,
                     icon=folium.Icon(color=color)).add_to(m)
@@ -211,7 +222,7 @@ def get_df_for_maps(sport_list, dep, commune_code_list, entire_dep = True):
     return df_licencies_par_code, df_licencies_par_fed, df_equip_f, cities_f
 
 
-def get_map(sport, dep, map_type):
+def get_map(sport, dep, map_type, marker_type):
 
     # Import dataframes
     df_equip = pl.read_parquet('data/transformed/equip_es.parquet')
@@ -256,11 +267,12 @@ def get_map(sport, dep, map_type):
     df_equip_f['label_html'] = df_equip_f.apply(lambda x: f"<b>{x['inst_nom']} - {x['equip_nom']}</b><br/> \
                                 {x['equip_type_famille']} > {x['equip_type_name']} <br/> \
                                 {x['inst_adresse']} {x['inst_cp']} {x['inst_com_nom']} <br/> \
+                                Accès aux personnes en situation de handicap : {'Oui' if x['inst_acc_handi_bool'] == True else 'Non' if x['inst_acc_handi_bool'] == False else 'Non défini'} <br/> \
+                                Accès PMR : {'Oui' if x['equip_pmr_acc'] == True else 'Non' if x['equip_pmr_acc'] == False else 'Non défini'} <br/> \
+                                Infrastructure équipée de douches : {'Oui' if x['equip_sanit'] == True else 'Non' if x['equip_sanit'] == False else 'Non défini'} <br/> \
+                                Sport pratiqué dans l'infrastructure : {'Oui' if x['equip_type_name'] == True else 'Non' if x['equip_type_name'] == False else 'Non défini'} <br/> \
                                 {'En activité : Oui' if x['inst_actif'] else 'En activité : Non'}", axis = 1)
                                    
-
-
-    # Add the choropleth layer
 
     if map_type == 'Nombre de licenciés':
         heatmap_field = 'nb_licencies'
@@ -268,8 +280,17 @@ def get_map(sport, dep, map_type):
     else:
         heatmap_field = 'pct_licencies'
 
-    color_mapping = get_colors_mapping()
+    marker_mapping = {"Accès aux personnes en situation de handicap": 'inst_acc_handi_bool',
+                      "Accès PMR": 'equip_pmr_acc', 
+                      "Infrastructure équipée de douches": 'equip_douche', 
+                      "Infrastructure équipée de sanitaires": 'equip_sanit', 
+                      "Sport pratiqué dans l'infrastructure": 'equip_type_name'}
 
+    marker_field = marker_mapping[marker_type]
+
+    color_mapping = get_colors_mapping(marker_field)
+
+    # Add the choropleth layer
     folium.Choropleth(
         geo_data=geojson_data,
         name='choropleth',
@@ -309,8 +330,8 @@ def get_map(sport, dep, map_type):
                      max_height=100,
                      max_width=500)
         
-        equipment_type = equipment['equip_type_name']
-        color = color_mapping.get(equipment_type, 'black')
+        color = color_mapping.get(equipment[marker_field], 'gray')
+
         folium.Marker(location=[equipment['equip_y'], equipment['equip_x']],
                     popup=popup,
                     icon=folium.Icon(color=color)).add_to(m)

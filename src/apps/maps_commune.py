@@ -30,7 +30,8 @@ def maps_commune():
             commune_list = st.multiselect("Choisir une ou plusieurs communes", commune_options, max_selections=10)
         
         map_type = st.selectbox("Colorer la cartographie en fonction de", ['Nombre de licenciés', 'Ratio Nb licenciés / Nb habitants'])
-        
+        marker_type = st.selectbox("Colorer les marqueurs de cartographie en fonction du", ['Accès aux personnes en situation de handicap', 'Accès PMR', 'Infrastructure équipée de douches', 'Infrastructure équipée de sanitaires', "Sport pratiqué dans l'infrastructure"])
+
         submitted = st.button("Valider")
 
     if submitted:
@@ -40,24 +41,27 @@ def maps_commune():
         commune_code_list = get_commune_code_list(commune_df, commune_list)
         print(commune_code_list)
 
-        tab1, tab2 = st.tabs(["📈 Pratique des sports sélectionnés", "🗺️ Cartographie"])
         with st.spinner('Veuillez patienter ...'):
 
+            tab1, tab2 = st.tabs(["🗺️ Cartographie", "📈 Pratique des sports sélectionnés"])
+
+            df_licencies_par_code, df_licencies_par_fed, df_equip_f, cities_f = get_df_for_maps(sport_list, dep, commune_code_list, entire_dep=False)
+
             with tab1:
+
+                m = get_a_map(dep, map_type, df_equip_f, cities_f, marker_type)
+                plugins.Fullscreen().add_to(m)
+
+                st.subheader(f"Nb licenciés vs. Infrastructures | Département {dep}")
+                folium_static(m)
+
+            with tab2:
+
                 if 'Tous les sports' in sport_list:
                     sport_list = sport_options
                     graph_height = 2000
                 else:
                     graph_height = 800
 
-                df_licencies_par_code, df_licencies_par_fed, df_equip_f, cities_f = get_df_for_maps(sport_list, dep, commune_code_list, entire_dep=False)
                 fig = display_licencies_barh(df_licencies_par_fed, graph_height)
                 st.plotly_chart(fig)
-
-            with tab2:
-                m = get_a_map(dep, map_type, df_equip_f, cities_f)
-                plugins.Fullscreen().add_to(m)
-
-                st.subheader(f"Nb licenciés vs. Infrastructures | Département {dep}")
-                folium_static(m)
-               

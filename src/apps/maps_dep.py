@@ -27,24 +27,26 @@ def maps_dep():
             dep = st.selectbox("Choisir un département", dep_options)
         
         map_type = st.selectbox("Colorer la cartographie en fonction de", ['Nombre de licenciés', 'Ratio Nb licenciés / Nb habitants'])
+        marker_type = st.selectbox("Colorer les marqueurs de cartographie en fonction du", ['Accès aux personnes en situation de handicap', 'Accès PMR', 'Infrastructure équipée de douches', 'Infrastructure équipée de sanitaires', "Sport pratiqué dans l'infrastructure"])
         submitted = st.form_submit_button("Valider")
 
     if submitted:
 
-        tab1, tab2 = st.tabs(["📈 Pratique par sexe et tranche d'âge", "🗺️ Cartographie"])
+        tab1, tab2 = st.tabs(["🗺️ Cartographie", "📈 Pratique par sexe et tranche d'âge"])
         with st.spinner('Veuillez patienter ...'):
 
             df_licencies_agg = transform_licencies_for_graph(fed_sports, sport, dep)
 
             with tab1:
+                m = get_map(sport, dep, map_type, marker_type)
+                plugins.Fullscreen().add_to(m)
+
+                st.subheader(f"Nb licenciés vs. Infrastructures | {sport} | Département {dep}")
+                folium_static(m)                
+
+            with tab2:
                 st.subheader(f"Nb licenciés | {sport} | Département {dep}")
                 fig = display_licencies_plotline(df_licencies_agg, sport, dep)
                 st.plotly_chart(fig)
-
-            with tab2:
-                    m = get_map(sport, dep, map_type)
-                    plugins.Fullscreen().add_to(m)
-
-                    st.subheader(f"Nb licenciés vs. Infrastructures | {sport} | Département {dep}")
-                    folium_static(m)
+                    
 

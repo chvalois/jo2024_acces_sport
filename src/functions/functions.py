@@ -103,25 +103,35 @@ def get_column_mapping():
 
     return(col_to_display)
 
-def get_colors_mapping():
+def get_colors_mapping(type):
     
-    # Define a color mapping based on the type of sportive equipment
-    color_mapping = {
-        'Terrain de pétanque': 'beige', 
-        'Terrain de volley-ball': 'red', 
-        "Piste d'athlétisme isolée": 'orange', 
-        'Multisports/City-stades': 'orange', 
-        'Skatepark': 'green', 
-        'Salle multisports (gymnase)': 'green', 
-        'Salle de tennis de table': 'green', 
-        'Piste de bicross': 'green', 
-        'Parcours sportif/santé': 'green', 
-        'Court de tennis': 'red', 
-        "Dojo / Salle d'arts martiaux": 'green', 
-        "Pas de tir à l'arc": 'green', 
-        'Terrain de football': 'blue', 
-        'Terrain de hockey sur gazon': 'green'}
+    if type == 'equip_type_name':
 
+        # Define a color mapping based on the type of sportive equipment
+        color_mapping = {
+            'Terrain de pétanque': 'beige', 
+            'Terrain de volley-ball': 'red', 
+            "Piste d'athlétisme isolée": 'orange', 
+            'Multisports/City-stades': 'orange', 
+            'Skatepark': 'green', 
+            'Salle multisports (gymnase)': 'green', 
+            'Salle de tennis de table': 'green', 
+            'Piste de bicross': 'green', 
+            'Parcours sportif/santé': 'green', 
+            'Court de tennis': 'red', 
+            "Dojo / Salle d'arts martiaux": 'green', 
+            "Pas de tir à l'arc": 'green', 
+            'Terrain de football': 'blue', 
+            'Terrain de hockey sur gazon': 'green'}
+
+    elif type in ['inst_acc_handi_bool', 'equip_douche', 'equip_sanit', 'equip_pmr_acc']:
+
+        # Define a color mapping based on access handisport
+        color_mapping = {
+            True: 'green', 
+            False: 'red'
+            }
+    
     return(color_mapping)
 
 

@@ -94,7 +94,11 @@ def get_column_mapping():
                       "Nombre de femmes licenciées": "nb_licencies_F",
                       "Pourcentage de femmes licenciées": "pct_licencies_F",
                       "Nombre d'hommes licenciés": "nb_licencies_H",
-                      "Pourcentage d'hommes licenciés": "pct_licencies_H"
+                      "Pourcentage d'hommes licenciés": "pct_licencies_H",
+                      "Nombre de licenciés de moins de 20 ans": 'nb_licencies_inf_20',
+                      "Pourcentage de licenciés de moins de 20 ans": 'pct_licencies_inf_20',
+                      "Nombre de licenciés de plus de 60 ans": 'nb_licencies_sup_60',
+                      "Pourcentage de licenciés de plus de 60 ans": 'pct_licencies_sup_60'
                       }
 
     return(col_to_display)
@@ -120,7 +124,8 @@ def get_colors_mapping():
 
     return(color_mapping)
 
-def pivot_lic_df():
+
+def pivot_lic_df_genre():
     # Load dataframe
     df = pd.read_parquet('data/transformed/lic-data-2021_details_agg_hf.parquet')
 
@@ -137,15 +142,78 @@ def pivot_lic_df():
 
     return df
 
+def pivot_lic_df_age():
+    # Load dataframe
+    df = pd.read_parquet('data/transformed/lic-data-2021_details_agg.parquet')
+
+    mapping_age = {'01 à 04 ans' : 'Moins de 20 ans',
+               '05 à 09 ans' : 'Moins de 20 ans', 
+               '10 à 14 ans' : 'Moins de 20 ans',
+               '15 à 19 ans' : 'Moins de 20 ans',
+               '20 à 24 ans' : 'Entre 20 et 59 ans',
+               '25 à 29 ans' : 'Entre 20 et 59 ans',
+               '30 à 34 ans' : 'Entre 20 et 59 ans',
+               '35 à 39 ans' : 'Entre 20 et 59 ans', 
+               '40 à 44 ans' : 'Entre 20 et 59 ans',
+               '45 à 49 ans' : 'Entre 20 et 59 ans',
+               '50 à 54 ans' : 'Entre 20 et 59 ans',
+               '55 à 59 ans' : 'Entre 20 et 59 ans',
+               '60 à 64 ans' : 'Plus de 60 ans',
+               '65 à 69 ans' : 'Plus de 60 ans',
+               '70 à 74 ans' : 'Plus de 60 ans',
+               '75 à 79 ans' : 'Plus de 60 ans',
+               '80 à 99 ans' : 'Plus de 60 ans'
+               }
+    
+    df['categorie_age'] = df['age'].apply(lambda x: mapping_age[x])
+
+    df = df.groupby(['Département', 'Fédération', 'QPV_or_not', 'categorie_age']).sum().reset_index()
+    df = df.drop(columns = {'sexe', 'age'})
+
+    # Pivot dataframe containing nb licencies by Département, Fédération & QPV
+    df = df.pivot_table(index=['Département', 'Fédération', 'QPV_or_not'],
+                columns='categorie_age',
+                values='value').reset_index()
+
+    df = df.rename(columns = {'Département': 'code', 'Moins de 20 ans': 'nb_licencies_inf_20', 'Entre 20 et 59 ans': 'nb_licencies_20-59', 'Plus de 60 ans': 'nb_licencies_sup_60'})
+
+    df['nb_licencies'] = df['nb_licencies_inf_20'] + df['nb_licencies_20-59'] + df['nb_licencies_sup_60']
+    df['pct_licencies_inf_20'] = round((df['nb_licencies_inf_20'] / df['nb_licencies'] * 100), 2)
+    df['pct_licencies_sup_60'] = round((df['nb_licencies_sup_60'] / df['nb_licencies'] * 100), 2)
+
+    # Suppression de la colonne nb_licencies déjà présente dans le dataframe issu de la fonction pivot_lic_df_genre
+    df = df.drop(columns = {'nb_licencies'})
+
+    return df
+
+
+def get_lic_stat_df(fed):
+    df_genre = pivot_lic_df_genre()
+    df_age = pivot_lic_df_age()
+
+    if fed == "All":
+        df = df_genre.merge(df_age, how = 'left', on = ['Fédération', 'code', 'QPV_or_not'])
+    else:
+        df_genre = df_genre[df_genre['Fédération'] == fed]
+        df_age = df_age[df_age['Fédération'] == fed]
+        df = df_genre.merge(df_age, how = 'left', on = ['Fédération', 'code', 'QPV_or_not'])
+        df = df.drop(columns = {"Fédération"})
+
+    return df
+
+
 def display_barh(stat, dep, qpv):
 
     # Load dataframe
-    df = pivot_lic_df()
+    df = get_lic_stat_df(fed="All")
 
     if dep == 'Tous les départements':
         df = df.groupby(['Fédération', 'QPV_or_not']).sum().reset_index()
         df['pct_licencies_F'] = round((df['nb_licencies_F'] / df['nb_licencies'] * 100), 2)
         df['pct_licencies_H'] = round((df['nb_licencies_H'] / df['nb_licencies'] * 100), 2)
+        df['pct_licencies_inf_20'] = round((df['nb_licencies_inf_20'] / df['nb_licencies'] * 100), 2)
+        df['pct_licencies_sup_60'] = round((df['nb_licencies_sup_60'] / df['nb_licencies'] * 100), 2)
+
     else:
         df = df[df['code'] == dep]
 
@@ -156,6 +224,7 @@ def display_barh(stat, dep, qpv):
 
     col_to_display = get_column_mapping()
 
+    df = df.dropna()
     df = df.sort_values(by = col_to_display[stat], ascending = True)
 
     fig = px.bar(df, y="Fédération", x=col_to_display[stat], orientation='h', width=800, height=3500, text_auto=True)

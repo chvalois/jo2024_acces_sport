@@ -9,7 +9,11 @@ def barh_analysis():
                     "Nombre de femmes licenciées",
                     "Pourcentage de femmes licenciées",
                     "Nombre d'hommes licenciés", 
-                    "Pourcentage d'hommes licenciés"]
+                    "Pourcentage d'hommes licenciés",
+                    "Nombre de licenciés de moins de 20 ans",
+                    "Pourcentage de licenciés de moins de 20 ans",
+                    "Nombre de licenciés de plus de 60 ans",
+                    "Pourcentage de licenciés de plus de 60 ans"]
 
     dep_options = get_dep_list(include_all=True)
 

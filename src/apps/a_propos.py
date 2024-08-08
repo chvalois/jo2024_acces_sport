@@ -29,9 +29,10 @@ def a_propos():
         * Où sont les infrastructures sportives dans ma commune ?
         * Combien de licenciés y a t-il dans chaque commune de mon département ?
     * Inégalités sociales
-        * Dans quels départements y a t-il le plus de licenciés handisport ?
+        * Dans quels départements y a t-il le plus de licenciés de la fédération handisport ?
         * Quelles sont les fédérations sportives où la part de femmes licenciées est la plus faible ? 
-        * Quel est la répartition de l'âge des licenciés sportifs chez les hommes et les femmes pour un sport donné ?
+        * Quels sont les départements où la part de licenciés de plus de 60 ans est la plus faible pour une fédération donnée ?
+        * Quelle est la répartition de l'âge des licenciés sportifs chez les hommes et les femmes pour une fédération donnée ?
     """)
     
     st.write("**Ce projet est un travail en cours de réalisation, il ne contient donc pas encore tous les éléments permettant d'adresser l'intégralité de la problématique posée par le challenge, et notamment des recommandations.**")

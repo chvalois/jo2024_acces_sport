@@ -4,15 +4,23 @@ import geopandas as gpd
 import folium
 from folium import plugins
 import geopandas as gpd
-from src.functions.functions import get_mappings, get_colors_mapping, get_dep_centroid, get_column_mapping, pivot_lic_df
+from src.functions.functions import get_mappings, get_colors_mapping, get_dep_centroid, get_column_mapping, pivot_lic_df_genre, pivot_lic_df_age, get_lic_stat_df
 
 
 def display_france_map(fed, stat, qpv):
 
-    # Load GeoJSON file & dataframe
+    # Load GeoJSON file & dataframes
     dep_geojson = gpd.read_file('data/raw/departements.geojson')
-    df = pivot_lic_df()
-    df = df[df['Fédération'] == fed]
+    # df = pivot_lic_df_genre()
+    # df = df[df['Fédération'] == fed]
+
+    # df_age = pivot_lic_df_age()
+    # df_age = df_age[df_age['Fédération'] == fed]
+
+    # df = df.merge(df_age, how = 'left', on = ['Fédération', 'code', 'QPV_or_not'])
+    # df = df.drop(columns = {"Fédération"})
+
+    df = get_lic_stat_df(fed)
 
     # Create a map centered on France
     map_center = [46.494739, 2.602833] 
@@ -23,9 +31,9 @@ def display_france_map(fed, stat, qpv):
     df_qpv = df[df['QPV_or_not'] == True]
 
     if qpv == True:
-        dep_f = dep_geojson.merge(df_qpv[['code', 'nb_licencies_F', 'nb_licencies_H', 'pct_licencies_F', 'pct_licencies_H', 'nb_licencies']], on = 'code', how = 'left')
+        dep_f = dep_geojson.merge(df_qpv, on = 'code', how = 'left')
     else:
-        dep_f = dep_geojson.merge(df_all_zones[['code', 'nb_licencies_F', 'nb_licencies_H', 'pct_licencies_F', 'pct_licencies_H', 'nb_licencies']], on = 'code', how = 'left')
+        dep_f = dep_geojson.merge(df_all_zones, on = 'code', how = 'left')
 
     dep_f = dep_f.reset_index()
     dep_f['id'] = dep_f.index
@@ -58,8 +66,9 @@ def display_france_map(fed, stat, qpv):
         'opacity': 0.3
         },
         tooltip=folium.GeoJsonTooltip(
-            fields=['nom', 'nb_licencies', 'nb_licencies_F', 'pct_licencies_F', 'nb_licencies_H', 'pct_licencies_H'],
-            aliases=['Commune:', "Nombre total de licenciés", "Nombre de femmes licenciées", "Pourcentage de femmes licenciées", "Nombre d'hommes licenciés", "Pourcentage d'hommes licenciés"],
+            fields=['nom', 'nb_licencies', 'nb_licencies_F', 'pct_licencies_F', 'nb_licencies_H', 'pct_licencies_H', 'nb_licencies_inf_20', 'pct_licencies_inf_20', 'nb_licencies_sup_60', 'pct_licencies_sup_60'],
+            aliases=['Commune:', "Nombre total de licenciés", "Nombre de femmes licenciées", "Pourcentage de femmes licenciées", "Nombre d'hommes licenciés", "Pourcentage d'hommes licenciés", 
+                     "Nombre de licenciés de moins de 20 ans", "Pourcentage de licenciés de moins de 20 ans", "Nombre de licenciés de plus de 60 ans", "Pourcentage de licenciés de plus de 60 ans"],
             localize=True
         )
     ).add_to(m)

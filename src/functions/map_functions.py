@@ -262,7 +262,7 @@ def get_a_map(dep, map_type, df_equip_f, cities_f, marker_type):
                                 Période de mise en service : {x['equip_service_periode']} <br/> \
                                 Période des derniers travaux : {x['equip_travaux_periode']} <br/> \
                                 {'En activité : Oui' if x['inst_actif'] else 'En activité : Non'}", axis = 1)
-                                   
+
     # Add the choropleth layer
 
     if map_type == 'Nombre de licenciés':
@@ -356,7 +356,11 @@ def get_df_for_maps(sport_list, dep, commune_code_list, entire_dep = True):
     # Get mappings
     es_sports, fed_sports = get_mappings()
     fed_list = fed_sports[fed_sports['sport'].isin(sport_list)]['federation'].to_list()
-    equip_type_list = es_sports[es_sports['sport'].isin(sport_list)]['equip_type_name'].to_list()
+
+    if 'Tous les sports' in sport_list:
+        equip_type_list = sorted(es_sports['equip_type_name'].to_list())
+    else:
+        equip_type_list = es_sports[es_sports['sport'].isin(sport_list)]['equip_type_name'].to_list()
 
     # Filter dataframe df_equip using Polars
     if entire_dep == True:

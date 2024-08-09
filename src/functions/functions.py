@@ -181,7 +181,12 @@ def get_mapping_stats_equip():
 
 
 def get_markers_html(df, marker_field, color_mapping):
-    markers_value = sorted(list(set(df[marker_field])))
+    
+    markers_value = list(set(df[marker_field]))
+    
+    if marker_field in ['equip_service_periode', 'equip_travaux_periode']:
+        markers_value = sorted(markers_value)
+
     html_markers = ""
     for marker in markers_value:
         color = color_mapping.get(marker)

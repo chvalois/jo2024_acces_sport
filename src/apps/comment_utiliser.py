@@ -10,8 +10,6 @@ def comment_utiliser():
 
     st.write("**Action possible**") 
     st.write("- Mener des campagnes de communication dans les départements où les femmes sont peu représentées dans le football")
-    st.write("- Equiper les terrains de football de sanitaires. Par exemple, en Corse du Sud, de nombreux équipements ne semblent pas en être pourvus :")
-    st.image('resources/demo/sanitaires_corse_sud.png', width=600)
 
     st.divider()
 

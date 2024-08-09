@@ -4,7 +4,9 @@ from src.apps.maps_equip_france import maps_equip_france
 from src.apps.maps_dep import maps_dep
 from src.apps.barh_analysis import barh_analysis
 from src.apps.maps_commune import maps_commune
+from src.apps.comment_utiliser import comment_utiliser
 from src.apps.a_propos import a_propos
+
 
 from streamlit_option_menu import option_menu
 
@@ -20,8 +22,9 @@ def main():
                                    "Nb licenciés et équipements sportifs par sport dans le département", 
                                    "Statistiques des licenciés par fédération",
                                    "Pratique du sport dans ma commune",
-                                   "A propos"], 
-            icons=['hexagon', 'hexagon-fill', 'building', '123', 'geo-alt-fill', 'question-circle'], menu_icon="list", default_index=0)
+                                   "Comment utiliser l'application ?",
+                                   "A propos de Spartoo"], 
+            icons=['hexagon', 'hexagon-fill', 'building', '123', 'geo-alt-fill', 'person-raised-hand', 'question-circle'], menu_icon="list", default_index=0)
         
         selected
 
@@ -41,7 +44,10 @@ def main():
     if selected == "Pratique du sport dans ma commune":
         maps_commune()
 
-    if selected == "A propos":
+    if selected == "Comment utiliser l'application ?":
+        comment_utiliser()
+
+    if selected == "A propos de Spartoo":
         a_propos()
 
 if __name__ == '__main__':

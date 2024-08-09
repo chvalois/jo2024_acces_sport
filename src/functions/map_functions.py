@@ -231,7 +231,10 @@ def display_france_map(fed, stat):
     plugins.Fullscreen().add_to(m)
 
     # Retraitement dataframe pour exposition sur l'application
-    df_export = dep_f.drop(columns = {'geometry', 'QPV_or_not', 'Fédération'})
+    df_export = dep_f.drop(columns = {'geometry', 'QPV_or_not'})
+
+    if fed == 'All':
+        df_export = df_export.drop(columns = {'Fédération'})
 
     return(m, df_export)
 

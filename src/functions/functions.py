@@ -39,17 +39,29 @@ def display_licencies_plotline(df, sport, dep):
 
     return fig 
 
-def display_licencies_barh(df, graph_height):
+def display_licencies_barh(df, graph_height, detail):
 
     df = df.sort_values(by = 'nb_licencies')
-    fig = px.bar(df, y="Fédération", x="nb_licencies", orientation='h', color='Commune', width=800, height=graph_height, text_auto=True)
-    fig.update_xaxes(automargin=True)
+    print(df.head())
 
-    fig.update_layout(
-        title = f"Nb total de licenciés par fédération dans les communes sélectionnées"
-    )
+    if detail == 'communes':
+        fig = px.bar(df, y="Fédération", x="nb_licencies", orientation='h', color='Commune', width=800, height=graph_height, text_auto=True)
+        fig.update_layout(title = f"Nb total de licenciés par fédération dans les communes sélectionnées")
+        fig.update_xaxes(automargin=True)
+        return fig 
 
-    return fig 
+    elif detail == 'dep':
+        fig = px.bar(df, y="Fédération", x="nb_licencies", orientation='h', width=800, height=graph_height, text_auto=True)
+        fig.update_layout(title = f"Nb total de licenciés par fédération dans le département")
+        fig.update_xaxes(automargin=True)
+        return fig 
+
+    elif detail == 'france':
+        fig = px.bar(df, y="Fédération", x="nb_licencies", orientation='h', width=800, height=graph_height, text_auto=True)
+        fig.update_layout(title = f"Nb total de licenciés par fédération en France")
+        fig.update_xaxes(automargin=True)
+        return fig 
+
 
 def get_mappings():
     es_sports = pd.read_json('data/transformed/mapping_es_sports.json', orient='index')
@@ -91,14 +103,19 @@ def get_dep_centroid(dep):
 
 def get_column_mapping():
     col_to_display = {"Nombre total de licenciés": "nb_licencies",
+                      "Ratio nombre de licenciés / population totale": "ratio_licencies_pop",
                       "Nombre de femmes licenciées": "nb_licencies_F",
                       "Pourcentage de femmes licenciées": "pct_licencies_F",
+                      "Ratio nombre de femmes licenciées / population femmes": 'ratio_licencies_F_pop',
                       "Nombre d'hommes licenciés": "nb_licencies_H",
                       "Pourcentage d'hommes licenciés": "pct_licencies_H",
-                      "Nombre de licenciés de moins de 20 ans": 'nb_licencies_inf_20',
-                      "Pourcentage de licenciés de moins de 20 ans": 'pct_licencies_inf_20',
+                      "Ratio nombre d'hommes licenciées / population hommes": 'ratio_licencies_H_pop',
+                      "Nombre de licenciés de moins de 15 ans": 'nb_licencies_inf_15',
+                      "Pourcentage de licenciés de moins de 15 ans": 'pct_licencies_inf_15',
+                      "Ratio nombre de licenciés de moins de 15 ans / population moins de 15 ans" : 'ratio_licencies_inf_15_pop',
                       "Nombre de licenciés de plus de 60 ans": 'nb_licencies_sup_60',
-                      "Pourcentage de licenciés de plus de 60 ans": 'pct_licencies_sup_60'
+                      "Pourcentage de licenciés de plus de 60 ans": 'pct_licencies_sup_60',
+                      "Ratio nombre de licenciés de plus de 60 ans / population plus de 60 ans" :'ratio_licencies_sup_60_pop'
                       }
 
     return(col_to_display)
@@ -148,6 +165,21 @@ def get_colors_mapping(type):
 
     return(color_mapping)
 
+def get_mapping_stats_equip():
+
+    mapping = {"Nb équipements": 'inst_nom', 
+               "Nb équipements pourvus d'un accès aux personnes en situation de handicap": 'inst_acc_handi_bool',
+               "Pourcentage d'équipements pourvus d'un accès aux personnes en situation de handicap": 'inst_acc_handi_bool',               
+               "Nb équipements pourvus de douches": 'equip_douche', 
+               "Pourcentage d'équipements pourvus de douches": 'equip_douche', 
+               "Nb équipements pourvus de sanitaires": 'equip_sanit', 
+               "Pourcentage d'équipements pourvus de sanitaires": 'equip_sanit', 
+               "Année médiane de mise en service des équipements": 'equip_service_date_fixed',
+    }
+
+    return mapping
+
+
 def get_markers_html(df, marker_field, color_mapping):
     markers_value = sorted(list(set(df[marker_field])))
     html_markers = ""
@@ -182,18 +214,18 @@ def pivot_lic_df_age():
     # Load dataframe
     df = pd.read_parquet('data/transformed/lic-data-2021_details_agg.parquet')
 
-    mapping_age = {'01 à 04 ans' : 'Moins de 20 ans',
-               '05 à 09 ans' : 'Moins de 20 ans', 
-               '10 à 14 ans' : 'Moins de 20 ans',
-               '15 à 19 ans' : 'Moins de 20 ans',
-               '20 à 24 ans' : 'Entre 20 et 59 ans',
-               '25 à 29 ans' : 'Entre 20 et 59 ans',
-               '30 à 34 ans' : 'Entre 20 et 59 ans',
-               '35 à 39 ans' : 'Entre 20 et 59 ans', 
-               '40 à 44 ans' : 'Entre 20 et 59 ans',
-               '45 à 49 ans' : 'Entre 20 et 59 ans',
-               '50 à 54 ans' : 'Entre 20 et 59 ans',
-               '55 à 59 ans' : 'Entre 20 et 59 ans',
+    mapping_age = {'01 à 04 ans' : 'Moins de 15 ans',
+               '05 à 09 ans' : 'Moins de 15 ans', 
+               '10 à 14 ans' : 'Moins de 15 ans',
+               '15 à 19 ans' : 'Moins de 15 ans',
+               '20 à 24 ans' : 'Entre 15 et 59 ans',
+               '25 à 29 ans' : 'Entre 15 et 59 ans',
+               '30 à 34 ans' : 'Entre 15 et 59 ans',
+               '35 à 39 ans' : 'Entre 15 et 59 ans', 
+               '40 à 44 ans' : 'Entre 15 et 59 ans',
+               '45 à 49 ans' : 'Entre 15 et 59 ans',
+               '50 à 54 ans' : 'Entre 15 et 59 ans',
+               '55 à 59 ans' : 'Entre 15 et 59 ans',
                '60 à 64 ans' : 'Plus de 60 ans',
                '65 à 69 ans' : 'Plus de 60 ans',
                '70 à 74 ans' : 'Plus de 60 ans',
@@ -211,10 +243,10 @@ def pivot_lic_df_age():
                 columns='categorie_age',
                 values='value').reset_index()
 
-    df = df.rename(columns = {'Département': 'code', 'Moins de 20 ans': 'nb_licencies_inf_20', 'Entre 20 et 59 ans': 'nb_licencies_20-59', 'Plus de 60 ans': 'nb_licencies_sup_60'})
+    df = df.rename(columns = {'Département': 'code', 'Moins de 15 ans': 'nb_licencies_inf_15', 'Entre 15 et 59 ans': 'nb_licencies_15-59', 'Plus de 60 ans': 'nb_licencies_sup_60'})
 
-    df['nb_licencies'] = df['nb_licencies_inf_20'] + df['nb_licencies_20-59'] + df['nb_licencies_sup_60']
-    df['pct_licencies_inf_20'] = round((df['nb_licencies_inf_20'] / df['nb_licencies'] * 100), 2)
+    df['nb_licencies'] = df['nb_licencies_inf_15'] + df['nb_licencies_15-59'] + df['nb_licencies_sup_60']
+    df['pct_licencies_inf_15'] = round((df['nb_licencies_inf_15'] / df['nb_licencies'] * 100), 2)
     df['pct_licencies_sup_60'] = round((df['nb_licencies_sup_60'] / df['nb_licencies'] * 100), 2)
 
     # Suppression de la colonne nb_licencies déjà présente dans le dataframe issu de la fonction pivot_lic_df_genre
@@ -224,6 +256,7 @@ def pivot_lic_df_age():
 
 
 def get_lic_stat_df(fed):
+
     df_genre = pivot_lic_df_genre()
     df_age = pivot_lic_df_age()
 
@@ -247,7 +280,7 @@ def display_barh(stat, dep, qpv):
         df = df.groupby(['Fédération', 'QPV_or_not']).sum().reset_index()
         df['pct_licencies_F'] = round((df['nb_licencies_F'] / df['nb_licencies'] * 100), 2)
         df['pct_licencies_H'] = round((df['nb_licencies_H'] / df['nb_licencies'] * 100), 2)
-        df['pct_licencies_inf_20'] = round((df['nb_licencies_inf_20'] / df['nb_licencies'] * 100), 2)
+        df['pct_licencies_inf_15'] = round((df['nb_licencies_inf_15'] / df['nb_licencies'] * 100), 2)
         df['pct_licencies_sup_60'] = round((df['nb_licencies_sup_60'] / df['nb_licencies'] * 100), 2)
 
     else:
@@ -282,6 +315,42 @@ def transform_pop_df():
     pop = pop.rename({'CODGEO': 'code', 'P21_POP': 'nb_habitants'})
     pop.to_parquet('data/transformed/population_2021.parquet')
 
+    pop['dep'] = pop['code'].str[:2]
+    pop = pop.groupby('dep')['nb_habitants'].sum().reset_index()
+    pop.to_parquet('data/transformed/population_2021_par_dep.parquet')
+
+def transform_pop_df_with_details():
+    df_pop = pd.read_csv('data/raw/base-cc-evol-struct-pop-2021.csv', sep = ';', dtype = {'CODGEO': str})
+    df_pop = df_pop[['CODGEO', 
+                 'P21_POP', 'P21_POP0014', 'P21_POP1529', 'P21_POP3044', 'P21_POP4559', 'P21_POP6074', 'P21_POP7589', 'P21_POP90P',
+                 'P21_POPF', 'P21_F0014', 'P21_F1529', 'P21_F3044', 'P21_F4559', 'P21_F6074', 'P21_F7589', 'P21_F90P',
+                 'P21_POPH', 'P21_H0014', 'P21_H1529', 'P21_H3044', 'P21_H4559', 'P21_H6074', 'P21_H7589', 'P21_H90P']]
+
+    df_pop['pop_total'] = df_pop['P21_POP']
+    df_pop['pop_inf_15'] = df_pop['P21_POP0014']
+    df_pop['pop_15_59'] = df_pop['P21_POP1529'] + df_pop['P21_POP3044'] + df_pop['P21_POP4559']
+    df_pop['pop_sup_60'] = df_pop['P21_POP6074'] + df_pop['P21_POP7589'] + df_pop['P21_POP90P']
+    df_pop['pop_femmes'] = df_pop['P21_POPF']
+    df_pop['pop_femmes_inf_15'] = df_pop['P21_F0014']
+    df_pop['pop_femmes_15_59'] = df_pop['P21_F1529'] + df_pop['P21_F3044'] + df_pop['P21_F4559']
+    df_pop['pop_femmes_sup_60'] = df_pop['P21_F6074'] + df_pop['P21_F7589'] + df_pop['P21_F90P']
+    df_pop['pop_hommes'] = df_pop['P21_POPH']
+    df_pop['pop_hommes_inf_15'] = df_pop['P21_H0014']
+    df_pop['pop_hommes_15_59'] = df_pop['P21_H1529'] + df_pop['P21_H3044'] + df_pop['P21_H4559']
+    df_pop['pop_hommes_sup_60'] = df_pop['P21_H6074'] + df_pop['P21_H7589'] + df_pop['P21_H90P']                    
+                      
+    df_pop = df_pop.drop(columns = {'P21_POP', 'P21_POP0014', 'P21_POP1529', 'P21_POP3044',
+       'P21_POP4559', 'P21_POP6074', 'P21_POP7589', 'P21_POP90P', 'P21_POPF',
+       'P21_F0014', 'P21_F1529', 'P21_F3044', 'P21_F4559', 'P21_F6074',
+       'P21_F7589', 'P21_F90P', 'P21_POPH', 'P21_H0014', 'P21_H1529',
+       'P21_H3044', 'P21_H4559', 'P21_H6074', 'P21_H7589', 'P21_H90P'})                  
+
+    df_pop.to_parquet("data/transformed/population_2021_details_per_commune.parquet")
+
+    df_pop['DEP'] = df_pop['CODGEO'].str[:2]
+    df_pop = df_pop.groupby('DEP').sum().drop(columns = {'CODGEO'})
+    df_pop = df_pop.round(0).astype(int).reset_index()
+    df_pop.to_parquet("data/transformed/population_2021_details_per_dep.parquet")
 
 def transform_licencies_df():
     df = pd.read_csv('data/raw/lic-data-2021.csv', delimiter = ';', dtype = {'Code Commune': str, 'Département': str})
@@ -381,6 +450,10 @@ def transform_equip_sportif_df():
 
     df['equip_service_periode'] = df['equip_service_periode'].apply(lambda x: mapping_periodes[x])
     df['equip_travaux_periode'] = df['equip_travaux_periode'].apply(lambda x: mapping_periodes[x])
+
+    date_list = [str(x) for x in range(1900, 2050)]
+    df['equip_service_date_fixed'] = df['equip_service_date'].fillna(0)
+    df['equip_service_date_fixed'] = df['equip_service_date_fixed'].apply(lambda x: int(x) if x in date_list else "invalid")
 
     df.to_parquet('data/transformed/equip_es.parquet')
 

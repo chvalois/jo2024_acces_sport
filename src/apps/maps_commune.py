@@ -23,14 +23,14 @@ def maps_commune():
         col1, col2 = st.columns(2)
         with col1:
             sport_list = st.multiselect("Choisir un sport", sport_options_all)
-        with col2:
             dep = st.selectbox("Choisir un département", dep_options)
             commune_df = get_commune_list(dep)
             commune_options = sorted(list(set(commune_df['commune'])))
-            commune_list = st.multiselect("Choisir une ou plusieurs communes", commune_options, max_selections=10)
-        
-        map_type = st.selectbox("Colorer la cartographie en fonction de", ['Nombre de licenciés', 'Ratio Nb licenciés / Nb habitants'])
-        marker_type = st.selectbox("Colorer les marqueurs de cartographie en fonction du", ['Accès aux personnes en situation de handicap', 'Accès PMR', 'Infrastructure équipée de douches', 'Infrastructure équipée de sanitaires', "Sport pratiqué dans l'infrastructure", 
+            commune_list = st.multiselect("Choisir une ou plusieurs communes", commune_options, max_selections=10)        
+
+        with col2:
+            map_type = st.selectbox("Colorer la cartographie en fonction de", ['Nombre de licenciés', 'Ratio Nb licenciés / Nb habitants'])
+            marker_type = st.selectbox("Colorer les marqueurs de cartographie en fonction du", ['Accès aux personnes en situation de handicap', 'Accès PMR', 'Infrastructure équipée de douches', 'Infrastructure équipée de sanitaires', "Sport pratiqué dans l'infrastructure", 
                                                                                             "Période de mise en service", "Période des derniers travaux"])
 
         submitted = st.button("Valider")
@@ -46,7 +46,7 @@ def maps_commune():
 
             tab1, tab2 = st.tabs(["🗺️ Cartographie", "📈 Pratique des sports sélectionnés"])
 
-            df_licencies_par_code, df_licencies_par_fed, df_equip_f, cities_f = get_df_for_maps(sport_list, dep, commune_code_list, entire_dep=False)
+            df_licencies_france, df_licencies_dep, df_licencies_par_code, df_licencies_par_fed, df_equip_f, cities_f = get_df_for_maps(sport_list, dep, commune_code_list, entire_dep=False)
 
             with tab1:
 
@@ -62,7 +62,16 @@ def maps_commune():
                     sport_list = sport_options
                     graph_height = 2000
                 else:
-                    graph_height = 800
+                    nb_sports = len(sport_list)
+                    graph_height = 150 * nb_sports
 
-                fig = display_licencies_barh(df_licencies_par_fed, graph_height)
-                st.plotly_chart(fig)
+                fig1 = display_licencies_barh(df_licencies_par_fed, graph_height, detail="communes")
+                st.plotly_chart(fig1)
+
+                st.subheader('Comparaison avec les statistiques dans le département et en France')
+                fig2 = display_licencies_barh(df_licencies_dep, graph_height, detail="dep")
+                st.plotly_chart(fig2)                
+                
+                fig3 = display_licencies_barh(df_licencies_france, graph_height, detail="france")
+                st.plotly_chart(fig3)
+                

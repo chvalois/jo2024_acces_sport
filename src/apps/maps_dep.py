@@ -23,12 +23,12 @@ def maps_dep():
         col1, col2 = st.columns(2)
         with col1:
             sport = st.selectbox("Choisir un sport", sport_options)
-        with col2:
             dep = st.selectbox("Choisir un département", dep_options)
-        
-        map_type = st.selectbox("Colorer la cartographie en fonction de", ['Nombre de licenciés', 'Ratio Nb licenciés / Nb habitants'])
-        marker_type = st.selectbox("Colorer les marqueurs de cartographie en fonction du", ['Accès aux personnes en situation de handicap', 'Accès PMR', 'Infrastructure équipée de douches', 'Infrastructure équipée de sanitaires', "Sport pratiqué dans l'infrastructure", 
-                                                                                            "Période de mise en service", "Période des derniers travaux"])
+
+        with col2:
+            map_type = st.selectbox("Colorer la cartographie en fonction de", ['Nombre de licenciés', 'Ratio Nb licenciés / Nb habitants'])
+            marker_type = st.selectbox("Colorer les marqueurs de cartographie en fonction du", ['Accès aux personnes en situation de handicap', 'Accès PMR', 'Infrastructure équipée de douches', 'Infrastructure équipée de sanitaires', "Sport pratiqué dans l'infrastructure", 
+                                                                                                "Période de mise en service", "Période des derniers travaux"])
         submitted = st.form_submit_button("Valider")
 
     if submitted:

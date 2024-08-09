@@ -4,38 +4,143 @@ import geopandas as gpd
 import folium
 from folium import plugins
 import geopandas as gpd
-from src.functions.functions import get_mappings, get_colors_mapping, get_dep_centroid, get_column_mapping, get_lic_stat_df, get_markers_html
+from src.functions.functions import get_mappings, get_colors_mapping, get_dep_centroid, get_column_mapping, get_lic_stat_df, get_markers_html, get_mapping_stats_equip
 from src.functions import create_legend
 
-
-def display_france_map(fed, stat, qpv):
+def display_france_equip_map(equip_list, stat):
 
     # Load GeoJSON file & dataframes
     dep_geojson = gpd.read_file('data/raw/departements.geojson')
-    # df = pivot_lic_df_genre()
-    # df = df[df['Fédération'] == fed]
+    df_equip = pl.read_parquet('data/transformed/equip_es.parquet')
+    
+    # Get mappings
+    es_sports, fed_sports = get_mappings()
 
-    # df_age = pivot_lic_df_age()
-    # df_age = df_age[df_age['Fédération'] == fed]
+    if 'Tous les équipements' in equip_list:
+        equip_type_list = sorted(es_sports['equip_type_name'].to_list())
+    else:
+        equip_type_list = equip_list
 
-    # df = df.merge(df_age, how = 'left', on = ['Fédération', 'code', 'QPV_or_not'])
-    # df = df.drop(columns = {"Fédération"})
+    # Filter dataframe
+    df_equip_f = df_equip.filter(pl.col("equip_type_name").is_in(equip_type_list))
+    nb_total_equip = df_equip_f['inst_nom'].count()
 
-    df = get_lic_stat_df(fed)
+    mapping_equip_field = get_mapping_stats_equip()
+    equip_field = mapping_equip_field[stat]
+    
+    # Si la statistique souhaitée est la somme de champs booléens 
+    if equip_field in ['inst_acc_handi_bool', 'equip_pmr_acc', 'equip_douche', 'equip_sanit']:
+        df_equip_f = df_equip_f.group_by(['dep_code_filled'], maintain_order=True).agg(pl.sum(equip_field), pl.count('inst_nom')).to_pandas()
+        df_equip_f = df_equip_f.rename(columns = {'dep_code_filled': 'code', equip_field: 'stat', 'inst_nom': 'nb_equip'})
+        df_equip_f['pct_stat'] = round(df_equip_f['stat'] / df_equip_f['nb_equip'] * 100, 2)
+
+        aliases_for_map = ['Département : ', "Nombre total d'équipement : ", "Nb équipements pourvus : ", "Pourcentage d'équipements pourvus : "]
+        fields_for_map = ['nom', 'nb_equip', 'stat', 'pct_stat']
+
+    # Si la statistique souhaitée est la médiane d'un champ numérique
+    elif equip_field == 'equip_service_date_fixed':
+        df_equip_f = df_equip_f.filter(pl.col(equip_field).is_not_nan())
+        df_equip_f = df_equip_f.group_by(['dep_code_filled'], maintain_order=True).agg(pl.median(equip_field), pl.count('inst_nom')).to_pandas()
+        df_equip_f = df_equip_f.rename(columns = {'dep_code_filled': 'code', equip_field: 'stat', 'inst_nom': 'nb_equip'})
+
+        aliases_for_map = ['Département : ', "Nombre total d'équipements : ", "Année médiane de mise en service : "]
+        fields_for_map = ['nom', 'nb_equip', 'stat']
+
+    elif equip_field == 'inst_nom':
+        df_equip_f = df_equip_f.group_by(['dep_code_filled'], maintain_order=True).agg(pl.count('inst_nom')).to_pandas()
+        df_equip_f = df_equip_f.rename(columns = {'dep_code_filled': 'code', 'inst_nom': 'stat'})
+
+        aliases_for_map = ['Département : ', "Nombre total d'équipements : "]
+        fields_for_map = ['nom', 'stat']
+
+    if stat[:11] == 'Pourcentage':
+        col_to_display = 'pct_stat'
+    else:
+        col_to_display = 'stat'
 
     # Create a map centered on France
     map_center = [46.494739, 2.602833] 
     m = folium.Map(location=map_center, zoom_start=6)
     folium.TileLayer('cartodbpositron').add_to(m)
 
+    dep_f = dep_geojson.merge(df_equip_f, on = 'code', how = 'left')
+    dep_f = dep_f.reset_index()
+    dep_f['id'] = dep_f.index
+
+    # Convert the GeoDataFrame to a GeoJSON
+    geojson_data = dep_f.to_json()
+
+    folium.Choropleth(
+        geo_data=geojson_data,
+        name='choropleth',
+        data=dep_f,
+        columns=['id', col_to_display],
+        key_on='feature.properties.id',
+        fill_color='YlOrRd',
+        fill_opacity=0.7,
+        line_opacity=0.1,
+        line_weight=0.5,
+        legend_name=stat
+    ).add_to(m)
+
+    # Add tooltips
+    folium.GeoJson(
+        geojson_data,
+        style_function=lambda feature: {
+        'fillColor': 'transparent',  # No fill color
+        'color': '#007FFF',  # Border color
+        'weight': 0.5,  # Border width
+        'opacity': 0.3
+        },
+        tooltip=folium.GeoJsonTooltip(
+            aliases=aliases_for_map,
+            fields=fields_for_map,
+            localize=True
+        )
+    ).add_to(m)
+
+    # Retraitement dataframe pour exposition sur l'application
+    df_export = df_equip_f
+
+    # Display the map
+    # Activer le bouton fullscreen sur Folium
+    plugins.Fullscreen().add_to(m)
+    return(m, nb_total_equip, df_equip_f)
+
+def display_france_map(fed, stat):
+
+    # Load GeoJSON file & dataframes
+    dep_geojson = gpd.read_file('data/raw/departements.geojson')
+    df_pop = pd.read_parquet('data/transformed/population_2021_details_per_dep.parquet')
+    df_pop = df_pop.rename(columns = {'DEP': 'code'})
+    
+    if fed == "Toutes les fédérations":
+        fed = 'All'
+
+    df = get_lic_stat_df(fed)
+
+    df = df.merge(df_pop, on = "code", how = "left")
+    df['ratio_licencies_pop'] = round((df['nb_licencies'] / df['pop_total'] * 100), 2)
+    df['ratio_licencies_F_pop'] = round((df['nb_licencies_F'] / df['pop_femmes'] * 100), 2)
+    df['ratio_licencies_H_pop'] = round((df['nb_licencies_F'] / df['pop_hommes'] * 100), 2)
+    df['ratio_licencies_inf_15_pop'] = round((df['nb_licencies_inf_15'] / df['pop_inf_15'] * 100), 2)
+    df['ratio_licencies_sup_60_pop'] = round((df['nb_licencies_sup_60'] / df['pop_sup_60'] * 100), 2)
+
+    # Create a map centered on France
+    map_center = [46.494739, 2.602833] 
+    m = folium.Map(location=map_center, zoom_start=6)
+    folium.TileLayer('cartodbpositron').add_to(m)
+
+    if fed == 'All':
+        df = df.groupby(['code', 'QPV_or_not']).sum().reset_index()
+        df['pct_licencies_F'] = round((df['nb_licencies_F'] / df['nb_licencies'] * 100), 2)
+        df['pct_licencies_H'] = round((df['nb_licencies_H'] / df['nb_licencies'] * 100), 2)
+        df['pct_licencies_inf_15'] = round((df['nb_licencies_inf_15'] / df['nb_licencies'] * 100), 2)
+        df['pct_licencies_sup_60'] = round((df['nb_licencies_sup_60'] / df['nb_licencies'] * 100), 2)
+
     df_all_zones = df[df['QPV_or_not'] == False]
-    df_qpv = df[df['QPV_or_not'] == True]
-
-    if qpv == True:
-        dep_f = dep_geojson.merge(df_qpv, on = 'code', how = 'left')
-    else:
-        dep_f = dep_geojson.merge(df_all_zones, on = 'code', how = 'left')
-
+    
+    dep_f = dep_geojson.merge(df_all_zones, on = 'code', how = 'left')
     dep_f = dep_f.reset_index()
     dep_f['id'] = dep_f.index
 
@@ -57,6 +162,53 @@ def display_france_map(fed, stat, qpv):
         legend_name=col_to_display[stat]
     ).add_to(m)
 
+    if stat[:5] == 'Ratio':
+        aliases_for_map = ['Département:', 
+                           "Nombre total de licenciés", 
+                           "Ratio nb licenciés / population totale",
+                           "Nombre de femmes licenciées", 
+                           "Ratio nb femmes licenciées / population femmes", 
+                           "Nombre d'hommes licenciés", 
+                           "Ratio nb hommes licenciées / population hommes", 
+                           "Nombre de licenciés < 15 ans", 
+                           "Ratio nb licenciés < 15 ans / population < 15 ans", 
+                           "Nombre de licenciés > 60 ans", 
+                           "Ratio nb licenciés > 60 ans / population > 60 ans"]
+
+        fields_for_map = ['nom', 
+                          'nb_licencies',
+                          'ratio_licencies_pop',
+                          'nb_licencies_F', 
+                          'ratio_licencies_F_pop', 
+                          'nb_licencies_H', 
+                          'ratio_licencies_H_pop', 
+                          'nb_licencies_inf_15', 
+                          'ratio_licencies_inf_15_pop', 
+                          'nb_licencies_sup_60', 
+                          'ratio_licencies_sup_60_pop']
+    else:
+        aliases_for_map = ['Département:', 
+                           "Nombre total de licenciés", 
+                           "Nombre de femmes licenciées", 
+                           "Pourcentage de femmes licenciées", 
+                           "Nombre d'hommes licenciés", 
+                           "Pourcentage d'hommes licenciés", 
+                           "Nombre de licenciés de moins de 15 ans", 
+                           "Pourcentage de licenciés de moins de 15 ans", 
+                           "Nombre de licenciés de plus de 60 ans", 
+                           "Pourcentage de licenciés de plus de 60 ans"]
+
+        fields_for_map = ['nom', 
+                          'nb_licencies', 
+                          'nb_licencies_F', 
+                          'pct_licencies_F', 
+                          'nb_licencies_H', 
+                          'pct_licencies_H', 
+                          'nb_licencies_inf_15', 
+                          'pct_licencies_inf_15', 
+                          'nb_licencies_sup_60', 
+                          'pct_licencies_sup_60']
+
     # Add tooltips
     folium.GeoJson(
         geojson_data,
@@ -67,17 +219,21 @@ def display_france_map(fed, stat, qpv):
         'opacity': 0.3
         },
         tooltip=folium.GeoJsonTooltip(
-            fields=['nom', 'nb_licencies', 'nb_licencies_F', 'pct_licencies_F', 'nb_licencies_H', 'pct_licencies_H', 'nb_licencies_inf_20', 'pct_licencies_inf_20', 'nb_licencies_sup_60', 'pct_licencies_sup_60'],
-            aliases=['Commune:', "Nombre total de licenciés", "Nombre de femmes licenciées", "Pourcentage de femmes licenciées", "Nombre d'hommes licenciés", "Pourcentage d'hommes licenciés", 
-                     "Nombre de licenciés de moins de 20 ans", "Pourcentage de licenciés de moins de 20 ans", "Nombre de licenciés de plus de 60 ans", "Pourcentage de licenciés de plus de 60 ans"],
-            localize=True
+            aliases=aliases_for_map,
+            fields=fields_for_map,
+            localize=True, 
+            height=300
         )
     ).add_to(m)
 
     # Display the map
     # Activer le bouton fullscreen sur Folium
     plugins.Fullscreen().add_to(m)
-    return(m)
+
+    # Retraitement dataframe pour exposition sur l'application
+    df_export = dep_f.drop(columns = {'geometry', 'QPV_or_not', 'Fédération'})
+
+    return(m, df_export)
 
 def get_a_map(dep, map_type, df_equip_f, cities_f, marker_type):
 
@@ -97,7 +253,8 @@ def get_a_map(dep, map_type, df_equip_f, cities_f, marker_type):
                                 {x['inst_adresse']} {x['inst_cp']} {x['inst_com_nom']} <br/> \
                                 Accès aux personnes en situation de handicap : {'Oui' if x['inst_acc_handi_bool'] == True else 'Non' if x['inst_acc_handi_bool'] == False else 'Non défini'} <br/> \
                                 Accès PMR : {'Oui' if x['equip_pmr_acc'] == True else 'Non' if x['equip_pmr_acc'] == False else 'Non défini'} <br/> \
-                                Infrastructure équipée de douches : {'Oui' if x['equip_sanit'] == True else 'Non' if x['equip_sanit'] == False else 'Non défini'} <br/> \
+                                Infrastructure équipée de sanitaires : {'Oui' if x['equip_sanit'] == True else 'Non' if x['equip_sanit'] == False else 'Non défini'} <br/> \
+                                Infrastructure équipée de douches : {'Oui' if x['equip_douche'] == True else 'Non' if x['equip_douche'] == False else 'Non défini'} <br/> \
                                 Sport pratiqué dans l'infrastructure : {'Oui' if x['equip_type_name'] == True else 'Non' if x['equip_type_name'] == False else 'Non défini'} <br/> \
                                 Période de mise en service : {x['equip_service_periode']} <br/> \
                                 Période des derniers travaux : {x['equip_travaux_periode']} <br/> \
@@ -206,13 +363,22 @@ def get_df_for_maps(sport_list, dep, commune_code_list, entire_dep = True):
 
     df_equip_f = df_equip.filter(condition).to_pandas()
 
-    # Filter dataframe df_licencies using Polars
+    ### Filter dataframe df_licencies using Polars
+    # Filter on whole France
+    df_licencies_france = df_licencies.filter(pl.col('Fédération').is_in(fed_list))
+    df_licencies_france = df_licencies_france.group_by(['Fédération'], maintain_order=True).agg(pl.sum("nb_licencies")).to_pandas()
+
+    # Filter on department
+    condition = (pl.col('Fédération').is_in(fed_list)) & (pl.col("Département") == dep)
+    df_licencies_dep = df_licencies.filter(condition)
+    df_licencies_dep = df_licencies_dep.group_by(['Fédération'], maintain_order=True).agg(pl.sum("nb_licencies")).to_pandas()
+
     if entire_dep == True:
-        condition = (pl.col('Fédération').is_in(fed_list)) & (pl.col("Département") == dep)
+        df_licencies = df_licencies_dep
     else:
         condition = (pl.col('Fédération').is_in(fed_list)) & (pl.col("code").is_in(commune_code_list))
+        df_licencies = df_licencies.filter(condition)
 
-    df_licencies = df_licencies.filter(condition)
     df_licencies_par_code = df_licencies.group_by(['code'], maintain_order=True).agg(pl.sum("nb_licencies")).to_pandas()
     df_licencies_par_fed = df_licencies.group_by(['Commune', 'Fédération'], maintain_order=True).agg(pl.sum("nb_licencies")).to_pandas()
 
@@ -231,7 +397,7 @@ def get_df_for_maps(sport_list, dep, commune_code_list, entire_dep = True):
     cities_f['id'] = cities_f.index
 
 
-    return df_licencies_par_code, df_licencies_par_fed, df_equip_f, cities_f
+    return df_licencies_france, df_licencies_dep, df_licencies_par_code, df_licencies_par_fed, df_equip_f, cities_f
 
 
 def get_map(sport, dep, map_type, marker_type):
@@ -281,7 +447,8 @@ def get_map(sport, dep, map_type, marker_type):
                                 {x['inst_adresse']} {x['inst_cp']} {x['inst_com_nom']} <br/> \
                                 Accès aux personnes en situation de handicap : {'Oui' if x['inst_acc_handi_bool'] == True else 'Non' if x['inst_acc_handi_bool'] == False else 'Non défini'} <br/> \
                                 Accès PMR : {'Oui' if x['equip_pmr_acc'] == True else 'Non' if x['equip_pmr_acc'] == False else 'Non défini'} <br/> \
-                                Infrastructure équipée de douches : {'Oui' if x['equip_sanit'] == True else 'Non' if x['equip_sanit'] == False else 'Non défini'} <br/> \
+                                Infrastructure équipée de sanitaires : {'Oui' if x['equip_sanit'] == True else 'Non' if x['equip_sanit'] == False else 'Non défini'} <br/> \
+                                Infrastructure équipée de douches : {'Oui' if x['equip_douche'] == True else 'Non' if x['equip_douche'] == False else 'Non défini'} <br/> \
                                 Sport pratiqué dans l'infrastructure : {'Oui' if x['equip_type_name'] == True else 'Non' if x['equip_type_name'] == False else 'Non défini'} <br/> \
                                 Période de mise en service : {x['equip_service_periode']} <br/> \
                                 Période des derniers travaux : {x['equip_travaux_periode']} <br/> \

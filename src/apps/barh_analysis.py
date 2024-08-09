@@ -10,8 +10,8 @@ def barh_analysis():
                     "Pourcentage de femmes licenciées",
                     "Nombre d'hommes licenciés", 
                     "Pourcentage d'hommes licenciés",
-                    "Nombre de licenciés de moins de 20 ans",
-                    "Pourcentage de licenciés de moins de 20 ans",
+                    "Nombre de licenciés de moins de 15 ans",
+                    "Pourcentage de licenciés de moins de 15 ans",
                     "Nombre de licenciés de plus de 60 ans",
                     "Pourcentage de licenciés de plus de 60 ans"]
 

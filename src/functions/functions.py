@@ -47,7 +47,6 @@ def transform_licencies_for_graph(fed_sports, sport, dep):
     pd.DataFrame
     """
 
-    # df_agg = pl.read_parquet('data/transformed/lic-data-2021_details_agg.parquet')
     df_agg = pl.read_parquet('data/transformed/lic-data-latest_details_agg.parquet')
     
     fed_list = fed_sports[fed_sports['sport'] == sport]['federation'].to_list()

@@ -1,5 +1,6 @@
 /data/raw/*.csv
 /data/raw/*.gpkg
+/data/transformed/for_local_analysis
 /venv
 /notebook
 

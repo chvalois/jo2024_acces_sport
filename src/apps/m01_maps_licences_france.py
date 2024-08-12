@@ -54,7 +54,7 @@ def maps_licences_france(data_freshness):
             title = "FF de Basketball | Part de femmes licenciées en France"
             st.subheader(f"Exemple | {title}")    
             m, df = display_france_map("FF de Basketball", "Pourcentage de femmes licenciées", title)
-            folium_static(m, width=1200, height=800)
+            folium_static(m, height=750)
 
     if st.session_state.form_submitted:
         with st.spinner('Veuillez patienter ...'):

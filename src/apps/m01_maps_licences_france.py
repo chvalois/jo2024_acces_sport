@@ -1,9 +1,9 @@
 import streamlit as st
 from streamlit_folium import folium_static
-from src.functions.functions import get_mappings
+from src.functions.functions import get_mappings, display_map_save_button
 from src.functions.map_functions import display_france_map
 
-def maps_licences_france():
+def maps_licences_france(data_freshness):
     """ Formulaire Streamlit qui permet de visualiser sur une cartographie des statistiques sur la pratique des licenciés en France métropolitaine par département """
 
     # Initialize the session state if it does not already exist
@@ -51,21 +51,23 @@ def maps_licences_france():
     # Display a container if the form is not filled
     if not st.session_state.form_submitted:
         with st.container():
-            st.subheader(f"Exemple | FF de Basketball | Part de femmes licenciées en France")    
-            m, df = display_france_map("FF de Basketball", "Pourcentage de femmes licenciées")
-            folium_static(m, height = 750)
+            title = "FF de Basketball | Part de femmes licenciées en France"
+            st.subheader(f"Exemple | {title}")    
+            m, df = display_france_map("FF de Basketball", "Pourcentage de femmes licenciées", title)
+            folium_static(m, width=1200, height=800)
 
     if st.session_state.form_submitted:
         with st.spinner('Veuillez patienter ...'):
-            st.subheader(f"{fed} | {stat} en France")           
+            title = f"{fed} | {stat} en France | {str(data_freshness)}"
+            st.subheader(title)           
 
-            st.write("Données de 2021")
-
-            m, df = display_france_map(fed, stat)
+            m, df = display_france_map(fed, stat, title)
 
             with st.expander("Explorer le jeu de données", expanded=False):
                 st.dataframe(df)
 
-            folium_static(m, height = 750)
+            folium_static(m, width=1200, height=800)
+
+            display_map_save_button(m)
 
 

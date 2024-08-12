@@ -3,7 +3,9 @@ import polars as pl
 import plotly.express as px
 import geopandas as gpd
 from shapely.geometry import Point
-
+import zipfile
+import os
+import streamlit as st
 
 ###### ----- Fonctions de transformation de données ----- ######
 
@@ -292,8 +294,40 @@ def get_lic_stat_df(fed):
 
 
 
+###### ----- Fonctions d'affichage d'attributs streamlit ----- ######
 
+def display_map_save_button(m):
+    """
+    Affiche un bouton Download dans la page streamlit
 
+    Paramètres
+    -------
+    m : Folium map
+    """
+
+    # Step 2: Save the map as an HTML file
+    html_filepath = 'map.html'
+    m.save(html_filepath)
+
+    # Step 3: Compress the HTML file into a ZIP archive
+    zip_filename = 'map.zip'
+    with zipfile.ZipFile(zip_filename, 'w') as zipf:
+        zipf.write(html_filepath)
+
+    # Optionally, delete the HTML file after zipping
+    os.remove(html_filepath)
+
+    # Step 4: Create a download button in Streamlit
+    with open(zip_filename, 'rb') as zip_file:
+        st.download_button(
+            label='Download Map',
+            data=zip_file,
+            file_name=zip_filename,
+            mime='application/zip'
+        )
+
+    # Optionally, delete the ZIP file after providing it for download
+    os.remove(zip_filename)
 
 
 ###### ----- Fonctions d'affichage de graphiques ----- ######

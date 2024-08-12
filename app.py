@@ -13,6 +13,8 @@ st.set_page_config(page_title="Sportoo - Sport Data Viz", page_icon=":checkered_
 
 def main():
 
+    data_freshness = 2021
+
     with st.sidebar:
         selected = option_menu("Accès au sport en France", 
                                [
@@ -29,25 +31,25 @@ def main():
 
     # Naviguer vers la page sélectionnée
     if selected == 'Cartographie des licenciés en France':
-        maps_licences_france()
+        maps_licences_france(data_freshness)
 
     if selected == 'Statistiques des équipements en France':
-        maps_equip_france()
+        maps_equip_france(data_freshness)
 
     if selected == "Nb licenciés et équipements sportifs par sport dans le département":
-        maps_dep()
+        maps_dep(data_freshness)
 
     if selected == "Pratique du sport dans ma commune":
-        maps_commune()
+        maps_commune(data_freshness)
 
     if selected == "Statistiques des licenciés par fédération":
-        barh_analysis()
-        
+        barh_analysis(data_freshness)
+
     if selected == "Comment utiliser l'application ?":
-        comment_utiliser()
+        comment_utiliser(data_freshness)
 
     if selected == "A propos de Spartoo":
-        a_propos()
+        a_propos(data_freshness)
 
 if __name__ == '__main__':
     main()

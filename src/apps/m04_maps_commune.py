@@ -4,7 +4,7 @@ from streamlit_folium import folium_static
 from src.functions.map_functions import get_map_allsports, get_df_for_maps, get_a_map
 from src.functions.functions import get_dep_list, get_commune_list, get_mappings, display_licencies_barh, get_commune_code_list
 
-def maps_commune():
+def maps_commune(data_freshness):
     """ Formulaire Streamlit qui permet de visualiser les statistiques sur une ou plusieurs communes ainsi que les équipements sportifs associés """
 
     es_sports, fed_sports = get_mappings()
@@ -50,8 +50,8 @@ def maps_commune():
             df_licencies_france, df_licencies_dep, df_licencies_par_code, df_licencies_par_fed, df_equip_f, cities_f = get_df_for_maps(sport_list, dep, commune_code_list, entire_dep=False)
 
             with tab1:
-
-                m = get_a_map(dep, map_type, df_equip_f, cities_f, marker_type)
+                title = f"Infrastructures sportives vs. Licenciés | Département {dep} | {str(data_freshness)}"
+                m = get_a_map(dep, map_type, df_equip_f, cities_f, marker_type, title)
                 plugins.Fullscreen().add_to(m)
 
                 st.subheader(f"Nb licenciés vs. Infrastructures | Département {dep}")

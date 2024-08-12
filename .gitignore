@@ -2,6 +2,7 @@
 /data/raw/*.gpkg
 /data/transformed/for_local_analysis
 /venv
+/temp
 /notebook
 
 /venv_windows

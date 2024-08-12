@@ -1,6 +1,6 @@
 import streamlit as st
 
-def comment_utiliser():
+def comment_utiliser(data_freshness):
     """ Page Streamlit qui donne des exemples d'usages de l'application """
 
     st.title('Comment utiliser Sportoo ?')

@@ -1,7 +1,7 @@
 from branca.element import Template, MacroElement
 from folium.plugins import Fullscreen
 
-def run(m, map_title, legend_name, html_markers):
+def run(m, map_title, legend_name, html_markers, title_only = False, ):
     """
     Renvoie une cartographie Folium agrémentée d'un titre et d'une légende
 
@@ -63,24 +63,37 @@ def run(m, map_title, legend_name, html_markers):
 
     </script>
     </head>"""
-    
-    body = f"""
-    <body>
-        <div id='maptitle' class='maptitle'>{map_title}</div>
-        <div id='maplegend' class='maplegend' 
-            style='position:absolute; z-index:9999; border:2px solid grey; background-color:rgba(255, 255, 255, 0.8);
-            border-radius:6px; padding: 10px; font-size:14px; left: 20px; bottom: 20px;'>
-            
-            <div class='legend-title'>{legend_name}</div>
-            <div class='legend-scale'>
-                <ul class='legend-labels'>
-                    {html_markers}
-                </ul>
-            </div>
-        </div>            
-    </body>
-    </html>
-    """
+
+    if title_only == True:
+        body = f"""
+        <body>
+            <div id='maptitle' class='maptitle'>{map_title}</div>   
+            <div id='mapwatermark' class='mapwatermark'>Cette carte a été réalisée grâce à l'application <a href='https://chvalois-jo2024-acces-sport-app-tjnkgg.streamlit.app/' target='_blank'>Sportoo</a></div>
+        </body>
+        </html>
+        """        
+
+    else:
+        body = f"""
+        <body>
+            <div id='maptitle' class='maptitle'>{map_title}</div>
+            <div id='mapwatermark' class='mapwatermark'>Cette carte a été réalisée grâce à l'application <a href='https://chvalois-jo2024-acces-sport-app-tjnkgg.streamlit.app/' target='_blank'>Sportoo</a></div>
+            <div id='maplegend' class='maplegend' 
+                style='position:absolute; z-index:9999; border:2px solid grey; background-color:rgba(255, 255, 255, 0.8);
+                border-radius:6px; padding: 10px; font-size:14px; left: 20px; bottom: 20px;'>
+                
+                <div class='legend-title'>{legend_name}</div>
+                <div class='legend-scale'>
+                    <ul class='legend-labels'>
+                        {html_markers}
+                    </ul>
+                </div>
+            </div>            
+        </body>
+        </html>
+        """
+
+
     css = """
     <style type='text/css'>
     .maptitle {
@@ -93,6 +106,16 @@ def run(m, map_title, legend_name, html_markers):
         font-size:14px; 
         left: 50px; 
         top: 10px;
+        }
+    .mapwatermark {
+        position:absolute;
+        z-index:9999; 
+        background-color:rgba(255, 255, 255, 0.8);
+        border-radius:6px; 
+        padding: 10px; 
+        font-size:14px; 
+        right: 10px; 
+        bottom: 20px;
         }
     .maplegend .legend-title {
         text-align: left;

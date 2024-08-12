@@ -3,7 +3,7 @@ import geopandas as gpd
 import pandas as pd
 from src.functions.functions import get_dep_list, display_barh
 
-def barh_analysis():
+def barh_analysis(data_freshness):
     """ Formulaire Streamlit qui permet de visualiser les statistiques du nombre de licenciés par fédération sportive """
 
     stat_options = ["Nombre total de licenciés",
@@ -34,6 +34,6 @@ def barh_analysis():
 
     if submitted:
         with st.spinner('Veuillez patienter ...'):
-            st.subheader(f"{stat} par fédération")
+            st.subheader(f"{stat} par fédération | {str(data_freshness)}")
             fig = display_barh(stat, dep, qpv)
             st.plotly_chart(fig)

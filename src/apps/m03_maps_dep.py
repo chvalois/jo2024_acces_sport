@@ -5,7 +5,7 @@ from streamlit_folium import folium_static
 from src.functions.map_functions import get_map
 from src.functions.functions import get_mappings, transform_licencies_for_graph, display_licencies_plotline, get_dep_list
 
-def maps_dep():
+def maps_dep(data_freshness):
     """ Formulaire Streamlit qui permet de visualiser la répartition H/F et par tranche d'âge des licenciés, et d'afficher sur une cartographie des détails sur la pratique du sport sélectionné dans les communes du département """
 
     es_sports, fed_sports = get_mappings()
@@ -40,10 +40,12 @@ def maps_dep():
             df_licencies_agg = transform_licencies_for_graph(fed_sports, sport, dep)
 
             with tab1:
-                m = get_map(sport, dep, map_type, marker_type)
+                title = f"Infrastructures sportives vs. Licenciés | {sport} | Département {dep} | {str(data_freshness)}"
+                st.subheader(title)
+
+                m = get_map(sport, dep, map_type, marker_type, title)
                 plugins.Fullscreen().add_to(m)
 
-                st.subheader(f"Nb licenciés vs. Infrastructures | {sport} | Département {dep}")
                 folium_static(m, width=1200, height=800)                
 
             with tab2:

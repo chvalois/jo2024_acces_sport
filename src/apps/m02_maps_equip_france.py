@@ -7,7 +7,7 @@ from streamlit_folium import folium_static
 from src.functions.functions import get_mappings
 from src.functions.map_functions import display_france_equip_map
 
-def maps_equip_france():
+def maps_equip_france(data_freshness):
     """ Formulaire Streamlit qui permet de visualiser sur une cartographie des statistiques sur les équipements sportifs en France métropolitaine par département """
 
     es_sports, fed_sports = get_mappings()
@@ -39,15 +39,12 @@ def maps_equip_france():
 
     if submitted:
         with st.spinner('Veuillez patienter ...'):
-            st.subheader(f"{stat} en France")
-            st.write(f"{', '.join(equip_list)} | Données de 2021")
+            title = f"{stat} en France | {str(data_freshness)}"
+            st.subheader(title)
+            st.write(f"{', '.join(equip_list)}")
 
-            m, nb_total_equip, df = display_france_equip_map(equip_list, stat)
+            m, nb_total_equip, df = display_france_equip_map(equip_list, stat, title)
             
             st.write(f"Nombre total d'équipements comptabilisés en France : {nb_total_equip}")
 
-            #with st.expander("Explorer le jeu de données", expanded=False):
-            #    st.dataframe(df)
-
-            folium_static(m, height = 750)
-
+            folium_static(m, width=1200, height=800)

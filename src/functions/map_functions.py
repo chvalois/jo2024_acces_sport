@@ -7,7 +7,7 @@ import geopandas as gpd
 from src.functions.functions import get_mappings, get_colors_mapping, get_dep_centroid, get_column_mapping, get_lic_stat_df, get_markers_html, get_mapping_stats_equip
 from src.functions import create_legend
 
-def display_france_map(fed, stat):
+def display_france_map(fed, stat, title):
     """
     Retourne une cartographie de type Folium affichant les statistiques relatives aux licenciés d'une ou de la totalité des fédérations sportives
     Utilisé par m01_maps_licencies_france
@@ -151,6 +151,11 @@ def display_france_map(fed, stat):
     # Activer le bouton fullscreen sur Folium
     plugins.Fullscreen().add_to(m)
 
+    # Ajout d'un titre
+    marker_type = ''
+    html_markers = ''
+    m = create_legend.run(m, title, marker_type, html_markers, title_only=True)
+
     # Suppression des colonnes inutiles pour exposition du dataframe sur l'application
     df_export = dep_f.drop(columns = {'geometry', 'QPV_or_not'})
 
@@ -161,7 +166,7 @@ def display_france_map(fed, stat):
     return(m, df_export)
 
 
-def display_france_equip_map(equip_list, stat):
+def display_france_equip_map(equip_list, stat, title):
     """
     Retourne une cartographie de type Folium affichant la liste des équipements par département et la statistique demandée sous forme de heatmap
     Utilisé par m02_maps_equip_france
@@ -272,13 +277,18 @@ def display_france_equip_map(equip_list, stat):
         )
     ).add_to(m)
 
+    # Ajout d'un titre
+    marker_type = ''
+    html_markers = ''
+    m = create_legend.run(m, title, marker_type, html_markers, title_only=True)
+
     # Activer le bouton fullscreen sur Folium
     plugins.Fullscreen().add_to(m)
 
     return(m, nb_total_equip, df_equip_f)
 
 
-def get_map(sport, dep, map_type, marker_type):
+def get_map(sport, dep, map_type, marker_type, title):
     """
     Retourne une cartographie des équipements sportifs sur un département
     Utilisé par m03_maps_dep
@@ -416,7 +426,7 @@ def get_map(sport, dep, map_type, marker_type):
 
     # Ajout d'une légende customisée (HTML)
     html_markers = get_markers_html(df_equip_f, marker_field, color_mapping)
-    m = create_legend.run(m, f"Infrastructures sportives vs. Licenciés | {sport} | Département {dep}", marker_type, html_markers)
+    m = create_legend.run(m, title, marker_type, html_markers, title_only=False)
 
     # Save the map to an HTML file
     m.save('map.html')
@@ -424,7 +434,7 @@ def get_map(sport, dep, map_type, marker_type):
     return m
 
 
-def get_a_map(dep, map_type, df_equip_f, cities_f, marker_type):
+def get_a_map(dep, map_type, df_equip_f, cities_f, marker_type, title):
     """
     Retourne une cartographie de type Folium affichant les équipements et statistiques relatives à une ou plusieurs communes d'un département sélectionné par l'utilisateur
     Utilisé par m04_maps_commune
@@ -533,10 +543,7 @@ def get_a_map(dep, map_type, df_equip_f, cities_f, marker_type):
 
     # Ajout d'une légende customisée (HTML)
     html_markers = get_markers_html(df_equip_f, marker_field, color_mapping)
-    m = create_legend.run(m, f"Infrastructures sportives vs. Licenciés | Département {dep}", marker_type, html_markers)
-
-    # Sauvegarde de la map au format HTML à la racine du projet
-    m.save('map.html')
+    m = create_legend.run(m, title, marker_type, html_markers, title_only=False)
 
     return m
 

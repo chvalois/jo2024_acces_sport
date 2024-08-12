@@ -7,15 +7,16 @@ def comment_utiliser(data_freshness):
     st.write("Exemples d'analyses et d'insights")
 
     st.subheader("Dans quel département la part de femmes licenciées dans le football est-elle la plus faible ?")
-    st.image('resources/demo/pct_femmes_basket.png', width=600)
+    st.image('resources/demo/pct_femmes_football.png', width=1000)
 
     st.write(":bulb: **Action possible** | Ci-dessus en Corse ou dans le Morbihan par exemple") 
     st.write("- Mener des campagnes de communication dans les départements où les femmes sont peu représentées dans le football")
+    st.write("- S'assurer que les équipements sportifs en général sont adaptés à la pratique du sport par les femmes")
 
     st.divider()
 
     st.subheader("Dans quel département les personnes de plus de 60 ans sont-elles le moins licenciées toutes fédérations confondues ?")
-    st.image('resources/demo/ratio_licencies_60_sur_pop.png', width=800)
+    st.image('resources/demo/ratio_licencies_60_sur_pop.png', width=1000)
 
     st.write(":bulb: **Actions possibles** | Ci-dessus dans le Nord Est de la France par exemple") 
     st.write("- Favoriser le sport encadré des seniors")
@@ -48,8 +49,8 @@ def comment_utiliser(data_freshness):
 
     st.write(":bulb: **Action possible**") 
     st.write("- Prioriser les nouveaux équipements dans les départements où les équipements existants sont vieillissants, par exemple dans l'Essonne :")
-    st.image('resources/demo/annee_mise_en_service_equipements.png', width=800)
+    st.image('resources/demo/annee_mise_en_service_equipements.png', width=1000)
     st.write("A Grigny par exemple, de nombreuses infrastructures datant de 1965-1974 : ")
-    st.image('resources/demo/equipements_grigny.png', width=800)
+    st.image('resources/demo/equipements_grigny.png', width=1000)
 
     

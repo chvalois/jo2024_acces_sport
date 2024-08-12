@@ -2,7 +2,21 @@ from branca.element import Template, MacroElement
 from folium.plugins import Fullscreen
 
 def run(m, map_title, legend_name, html_markers):
+    """
+    Renvoie une cartographie Folium agrémentée d'un titre et d'une légende
+
+    Paramètres
+    -------
+    m : folium Map
+    map_title : str | titre à afficher sur la cartographie
+    legend_name : str | libellé de la légende
+    html_markers : str | code CSS correspondant au contenu à afficher dans la légende
     
+    Retourne
+    -------
+    m : folium Map
+    """ 
+
     head = """
     {% macro html(this, kwargs) %}
 

@@ -58,7 +58,7 @@ def maps_licences_france(data_freshness):
 
     if st.session_state.form_submitted:
         with st.spinner('Veuillez patienter ...'):
-            title = f"{fed} | {stat} en France | {str(data_freshness)}"
+            title = f"{fed} | {stat} | {str(data_freshness)}"
             st.subheader(title)           
 
             m, df = display_france_map(fed, stat, title)

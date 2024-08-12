@@ -39,7 +39,7 @@ def maps_equip_france(data_freshness):
 
     if submitted:
         with st.spinner('Veuillez patienter ...'):
-            title = f"{stat} en France | {str(data_freshness)}"
+            title = f"{stat} | {str(data_freshness)}"
             st.subheader(title)
             st.write(f"{', '.join(equip_list)}")
 

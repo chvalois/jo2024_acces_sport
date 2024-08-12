@@ -68,7 +68,7 @@ def run(m, map_title, legend_name, html_markers, title_only = False, ):
         body = f"""
         <body>
             <div id='maptitle' class='maptitle'>{map_title}</div>   
-            <div id='mapwatermark' class='mapwatermark'>Cette carte a été réalisée grâce à l'application <a href='https://chvalois-jo2024-acces-sport-app-tjnkgg.streamlit.app/' target='_blank'>Sportoo</a></div>
+            <div id='mapwatermark' class='mapwatermark'>Cette carte a été réalisée grâce à l'application <a href='https://sportoo.streamlit.app/' target='_blank'>Sportoo</a></div>
         </body>
         </html>
         """        
@@ -77,7 +77,7 @@ def run(m, map_title, legend_name, html_markers, title_only = False, ):
         body = f"""
         <body>
             <div id='maptitle' class='maptitle'>{map_title}</div>
-            <div id='mapwatermark' class='mapwatermark'>Cette carte a été réalisée grâce à l'application <a href='https://chvalois-jo2024-acces-sport-app-tjnkgg.streamlit.app/' target='_blank'>Sportoo</a></div>
+            <div id='mapwatermark' class='mapwatermark'>Cette carte a été réalisée grâce à l'application <a href='https://sportoo.streamlit.app/' target='_blank'>Sportoo</a></div>
             <div id='maplegend' class='maplegend' 
                 style='position:absolute; z-index:9999; border:2px solid grey; background-color:rgba(255, 255, 255, 0.8);
                 border-radius:6px; padding: 10px; font-size:14px; left: 20px; bottom: 20px;'>

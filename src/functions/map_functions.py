@@ -428,9 +428,6 @@ def get_map(sport, dep, map_type, marker_type, title):
     html_markers = get_markers_html(df_equip_f, marker_field, color_mapping)
     m = create_legend.run(m, title, marker_type, html_markers, title_only=False)
 
-    # Save the map to an HTML file
-    m.save('map.html')
-
     return m
 
 
@@ -751,8 +748,5 @@ def get_map_allsports(sport_list, dep, commune_list, stat):
         folium.Marker(location=[equipment['equip_y'], equipment['equip_x']],
                     popup=popup,
                     icon=folium.Icon(color=color)).add_to(m)
-        
-    # Sauvegarde de la map au format HTML
-    m.save('map.html')
 
     return m, df_licencies_par_fed

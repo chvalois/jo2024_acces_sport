@@ -14,7 +14,7 @@ st.logo("resources/logo_sportoo_300_100_transparent.png", link='https://sportoo.
 
 # Adapte la taille du logo et les couleurs de la sidebar
 st.html("""
-  <style>
+    <style>
     [alt=Logo] {
         height: 80px;
     }
@@ -22,7 +22,13 @@ st.html("""
     .menu .nav-item .nav-link.active[data-v-5af006b8] {
         background-color: var(--primary-color);
     }
-  </style>
+        
+    iframe {
+        width: 100%;
+        max-width: 1000px;
+        min-height: 800px;
+        height: 100%;
+    </style>
         """)
 
 def main():

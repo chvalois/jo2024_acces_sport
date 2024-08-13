@@ -65,7 +65,7 @@ def maps_licences_france(data_freshness):
 
             with st.expander("Explorer le jeu de données", expanded=False):
                 st.dataframe(df)
-
+                
             folium_static(m, width=1200, height=800)
 
             display_map_save_button(m, title)

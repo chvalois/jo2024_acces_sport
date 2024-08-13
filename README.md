@@ -23,6 +23,12 @@ J'ai tenté d'adresser les problématiques suivantes :
     - Quelle est la répartition de l'âge des licenciés sportifs chez les hommes et les femmes pour une fédération donnée ?
     - Dans quel département le pourcentage de bassins de natation pourvu d’accès handicapés est-il le plus faible ?
 
+Screenshot de l'application Sportoo
+------------
+![sportoo_screenshot](https://github.com/user-attachments/assets/5c3e00d8-6060-41b5-99ea-eebd602ca042)
+
+
+
 Organisation du projet
 ------------
 

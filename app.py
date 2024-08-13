@@ -10,7 +10,7 @@ from src.apps.m07_a_propos import a_propos
 from streamlit_option_menu import option_menu
 
 st.set_page_config(page_title="Sportoo - Sport Data Viz", page_icon=":checkered_flag:", layout="wide", initial_sidebar_state="auto", menu_items=None)
-st.logo("resources/logo_sportoo_300_100_inverted.png", link='https://sportoo.streamlit.app', icon_image=None)
+st.logo("resources/logo_sportoo_300_100_transparent.png", link='https://sportoo.streamlit.app', icon_image=None)
 
 # Adapte la taille du logo et les couleurs de la sidebar
 st.html("""

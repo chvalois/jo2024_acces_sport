@@ -5,13 +5,26 @@ def a_propos(data_freshness):
 
     st.title('A propos de Sportoo')
     st.write("Ce projet de data visualisation a été réalisé dans le cadre du challenge 'Accès au sport' posté sur le site https://defis.data.gouv.fr/")
-    st.write("Projet en version bêta - des erreurs de données sont encore possibles.")
+    st.write("Code source accessible sur Github : https://github.com/chvalois/jo2024_acces_sport")
+
+
+    st.write("Les travaux réalisés dans le cadre de ce projet permettront aux pouvoirs publics, notamment les collectivités territoriales, \
+             d'identifier les mesures adaptées pour corriger les inégalités sociales et territoriales pouvant exister \
+             (construction et rénovation d'équipements, animations, aménagement de l'espace public, etc.) et de suivre les résultats de leurs politiques publiques d'accès au sport.")
     
+    st.write("Projet en version bêta - des erreurs de données sont encore possibles.")
+        
     st.divider()
 
     st.subheader("Objectif du challenge tel que décrit sur le site du gouvernement")
     
     with st.container(border=True):
+
+        st.write("Ce projet vous propose de réaliser un état des lieux de l’égal accès aux activités sportives. Vous pourrez notamment vous intéresser : ")
+        st.write("* *aux questions d’inclusion des femmes et des hommes, des personnes en situation de handicap, des jeunes et des seniors, etc. ;*")
+        st.write("* *à la répartition territoriale de l’offre sportive (équipements, clubs) ainsi qu’à sa caractérisation sociodémographique ;*")
+        st.write("* *au lien entre développement de l’offre et développement de la pratique sportive.*")
+
         st.write("*La politique publique du sport entend donc en « favoriser l'accès […] pour toutes et tous, à tous les âges de la vie et sur l'ensemble du territoire hexagonal et ultramarin », \
              notamment à travers l'accompagnement des fédérations et le développement des équipements. \
              A ce titre, le plan « 5 000 équipements sportifs Génération 2024 » prévoit la création de 5 000 équipements supplémentaires entre 2024 et 2026, dont un tiers dans des quartiers prioritaires de la politique de la ville (QPV).*")

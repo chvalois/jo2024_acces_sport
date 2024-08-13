@@ -5,6 +5,8 @@ def a_propos(data_freshness):
 
     st.title('A propos de Sportoo')
     st.write("Ce projet de data visualisation a été réalisé dans le cadre du challenge 'Accès au sport' posté sur le site https://defis.data.gouv.fr/")
+    st.write("Projet en version bêta - des erreurs de données sont encore possibles.")
+    
     st.divider()
 
     st.subheader("Objectif du challenge tel que décrit sur le site du gouvernement")
@@ -44,8 +46,8 @@ def a_propos(data_freshness):
     st.divider()
 
     st.subheader("Datasets utilisés")
-    st.write(f"*Les données utilisées datent toutes de {str(data_freshness)} (les dernières disponibles à ce jour)*")
-    st.write("- Equipements Sportifs: https://defis.data.gouv.fr/datasets/65b47fde1b55e035045aa480")    
+    st.write(f"*Les données utilisées en dehors des équipements sportifs datent de {str(data_freshness)} (les dernières disponibles à ce jour)*")
+    st.write("- Equipements Sportifs (dernière mise à jour : 26/07/2024) : https://defis.data.gouv.fr/datasets/65b47fde1b55e035045aa480")    
     st.write("- Quartiers prioritaires de la politique de la ville (QPV) : https://defis.data.gouv.fr/datasets/5a561801c751df42d7fca9b6")    
     st.write("- Recensement des licences et clubs : https://defis.data.gouv.fr/datasets/53699ebba3a729239d205f58")    
     st.write("- Population : https://defis.data.gouv.fr/datasets/53699d0ea3a729239d205b2e")    

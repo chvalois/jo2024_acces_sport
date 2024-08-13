@@ -404,19 +404,19 @@ def display_licencies_barh(df, graph_height, detail):
     print(df.head())
 
     if detail == 'communes':
-        fig = px.bar(df, y="Fédération", x="nb_licencies", orientation='h', color='Commune', width=800, height=graph_height, text_auto=True)
+        fig = px.bar(df, y="Fédération", x="nb_licencies", orientation='h', color='Commune', width=1000, height=graph_height, text_auto=True, color_discrete_sequence=['#2633b0', '#ffe6eb', '#1d2786', '#141b5c', '#ffb3c2'])
         fig.update_layout(title = f"Nb total de licenciés par fédération dans les communes sélectionnées")
         fig.update_xaxes(automargin=True)
         return fig 
 
     elif detail == 'dep':
-        fig = px.bar(df, y="Fédération", x="nb_licencies", orientation='h', width=800, height=graph_height, text_auto=True)
+        fig = px.bar(df, y="Fédération", x="nb_licencies", orientation='h', width=1000, height=graph_height, text_auto=True, color_discrete_sequence=['#2633b0'])
         fig.update_layout(title = f"Nb total de licenciés par fédération dans le département")
         fig.update_xaxes(automargin=True)
         return fig 
 
     elif detail == 'france':
-        fig = px.bar(df, y="Fédération", x="nb_licencies", orientation='h', width=800, height=graph_height, text_auto=True)
+        fig = px.bar(df, y="Fédération", x="nb_licencies", orientation='h', width=1000, height=graph_height, text_auto=True, color_discrete_sequence=['#2633b0'])
         fig.update_layout(title = f"Nb total de licenciés par fédération en France")
         fig.update_xaxes(automargin=True)
         return fig 
@@ -460,7 +460,7 @@ def display_barh(stat, dep, qpv):
     df = df.dropna()
     df = df.sort_values(by = col_to_display[stat], ascending = True)
 
-    fig = px.bar(df, y="Fédération", x=col_to_display[stat], orientation='h', width=800, height=3500, text_auto=True)
+    fig = px.bar(df, y="Fédération", x=col_to_display[stat], orientation='h', width=800, height=3500, text_auto=True, color_discrete_sequence=['#2633b0'])
     fig.update_xaxes(automargin=True)
 
     return(fig)

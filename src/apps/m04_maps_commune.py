@@ -64,7 +64,8 @@ def maps_commune(data_freshness):
                     graph_height = 2000
                 else:
                     nb_sports = len(sport_list)
-                    graph_height = 150 * nb_sports
+                    nb_communes = len(commune_list)
+                    graph_height = (200 * nb_sports) if nb_sports > 1 else (200 + 25 * nb_communes)
 
                 fig1 = display_licencies_barh(df_licencies_par_fed, graph_height, detail="communes")
                 st.plotly_chart(fig1)

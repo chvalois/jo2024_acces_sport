@@ -10,13 +10,27 @@ from src.apps.m07_a_propos import a_propos
 from streamlit_option_menu import option_menu
 
 st.set_page_config(page_title="Sportoo - Sport Data Viz", page_icon=":checkered_flag:", layout="wide", initial_sidebar_state="auto", menu_items=None)
+st.logo("resources/logo_sportoo_300_100_inverted.png", link='https://sportoo.streamlit.app', icon_image=None)
+
+# Adapte la taille du logo et les couleurs de la sidebar
+st.html("""
+  <style>
+    [alt=Logo] {
+        height: 80px;
+    }
+        
+    .menu .nav-item .nav-link.active[data-v-5af006b8] {
+        background-color: var(--primary-color);
+    }
+  </style>
+        """)
 
 def main():
 
     data_freshness = 2021
 
     with st.sidebar:
-        selected = option_menu("Accès au sport en France", 
+        selected = option_menu("", 
                                [
                                    "Cartographie des licenciés en France",
                                    "Statistiques des équipements en France",

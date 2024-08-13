@@ -163,6 +163,9 @@ def run(m, map_title, legend_name, html_markers, title_only = False, ):
     .maplegend a {
         color: #777;
         }
+    .folium-map {
+        border: 2px solid #ffe6eb;
+        }
     </style>
     {% endmacro %}"""
     

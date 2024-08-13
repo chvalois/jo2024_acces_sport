@@ -41,10 +41,21 @@ def maps_equip_france(data_freshness):
         with st.spinner('Veuillez patienter ...'):
             title = f"{stat} | {str(data_freshness)}"
             st.subheader(title)
-            st.write(f"{', '.join(equip_list)}")
-
-            m, nb_total_equip, df = display_france_equip_map(equip_list, stat, title)
             
-            st.write(f"Nombre total d'équipements comptabilisés en France : {nb_total_equip}")
+            m, nb_total_equip, df = display_france_equip_map(equip_list, stat, title)
+            st.write(f"{', '.join(equip_list)} | Nombre total d'équipements comptabilisés en France : {nb_total_equip}")
+
+            # Apply CSS to add a border around the map
+            st.markdown(
+                """
+                <style>
+                .folium-map {
+                    border: 2px solid #ffe6eb;
+                }
+                </style>
+                """,
+                unsafe_allow_html=True
+            )
 
             folium_static(m, width=1200, height=800)
+

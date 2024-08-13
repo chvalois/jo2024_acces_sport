@@ -6,6 +6,7 @@ from shapely.geometry import Point
 import zipfile
 import os
 import streamlit as st
+import unicodedata
 
 ###### ----- Fonctions de transformation de données ----- ######
 
@@ -296,7 +297,27 @@ def get_lic_stat_df(fed):
 
 ###### ----- Fonctions d'affichage d'attributs streamlit ----- ######
 
-def display_map_save_button(m):
+def transform_string_to_filename(s):
+    """
+    Transforme une chaîne de caractère en une autre sans accents, en minuscule, et avec des underscores à la place des espaces
+
+    Paramètres
+    -------
+    m : Folium map
+    """
+
+    # Normalisation de la chaîne
+    normalized_string = unicodedata.normalize('NFD', s)
+    string_without_accents = ''.join([c for c in normalized_string if unicodedata.category(c) != 'Mn'])
+
+    # Remplacement des espaces par _, et des | par rien
+    final_string = string_without_accents.replace(' ', '_').lower()
+    final_string = final_string.replace('|', '').lower()
+
+    return(final_string)
+
+
+def display_map_save_button(m, title):
     """
     Affiche un bouton Download dans la page streamlit
 
@@ -305,28 +326,30 @@ def display_map_save_button(m):
     m : Folium map
     """
 
-    # Step 2: Save the map as an HTML file
-    html_filepath = 'map.html'
+    title = transform_string_to_filename(title)
+
+    # Sauvegarde de la carte en html
+    html_filepath = f'map_{title}.html'
     m.save(html_filepath)
 
-    # Step 3: Compress the HTML file into a ZIP archive
+    # Compression en ZIP
     zip_filename = 'map.zip'
     with zipfile.ZipFile(zip_filename, 'w') as zipf:
         zipf.write(html_filepath)
 
-    # Optionally, delete the HTML file after zipping
+    # Suppression du fichier HTML temporaire
     os.remove(html_filepath)
 
-    # Step 4: Create a download button in Streamlit
+    # Création du bouton Streamlit
     with open(zip_filename, 'rb') as zip_file:
         st.download_button(
-            label='Download Map',
+            label='Télécharger la carte',
             data=zip_file,
             file_name=zip_filename,
             mime='application/zip'
         )
 
-    # Optionally, delete the ZIP file after providing it for download
+    # Suppression du fichier ZIP temporaire
     os.remove(zip_filename)
 
 

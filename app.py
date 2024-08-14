@@ -34,6 +34,7 @@ st.html("""
 def main():
 
     data_freshness = 2021
+    data_es_freshness = 2024
 
     with st.sidebar:
         selected = option_menu("", 
@@ -54,7 +55,7 @@ def main():
         maps_licences_france(data_freshness)
 
     if selected == 'Statistiques des équipements en France':
-        maps_equip_france(data_freshness)
+        maps_equip_france(data_es_freshness)
 
     if selected == "Nb licenciés et équipements sportifs par sport dans le département":
         maps_dep(data_freshness)

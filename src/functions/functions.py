@@ -297,6 +297,24 @@ def get_lic_stat_df(fed):
 
 ###### ----- Fonctions d'affichage d'attributs streamlit ----- ######
 
+def display_responsive_image(url_list):
+    """
+    Affiche les images de manière responsive dans une page Streamlit en utilisant la fonctionnalité st.columns
+
+    Paramètres
+    -------
+    url_list : list | liste d'url des images à afficher
+    """
+
+    nb_images = len(url_list)
+    img_number_list = range(nb_images)
+    columns = st.columns(nb_images)
+
+    for col, i in zip(columns, img_number_list):
+        with col:
+            st.image(url_list[i], use_column_width=True, width=1000)
+
+
 def transform_string_to_filename(s):
     """
     Transforme une chaîne de caractère en une autre sans accents, en minuscule, et avec des underscores à la place des espaces

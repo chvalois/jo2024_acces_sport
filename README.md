@@ -25,7 +25,8 @@ J'ai tenté d'adresser les problématiques suivantes :
 
 Screenshot de l'application Sportoo
 ------------
-![sportoo_screenshot](https://github.com/user-attachments/assets/5c3e00d8-6060-41b5-99ea-eebd602ca042)
+![sportoo_screenshot](https://github.com/user-attachments/assets/a85c2b05-b1e9-40e7-917d-0fa4bec73d29)
+
 
 
 

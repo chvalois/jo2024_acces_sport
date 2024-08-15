@@ -422,19 +422,19 @@ def display_licencies_barh(df, graph_height, detail):
     print(df.head())
 
     if detail == 'communes':
-        fig = px.bar(df, y="Fédération", x="nb_licencies", orientation='h', color='Commune', width=1000, height=graph_height, text_auto=True, color_discrete_sequence=['#2633b0', '#ffe6eb', '#1d2786', '#141b5c', '#ffb3c2'])
+        fig = px.bar(df, y="Fédération", x="nb_licencies", orientation='h', color='Commune', width=1000, height=graph_height, text_auto=True, color_discrete_sequence=['#27474E', '#7D387D', '#C45BAA', '#CD8B76', '#FCE38A'])
         fig.update_layout(title = f"Nb total de licenciés par fédération dans les communes sélectionnées")
         fig.update_xaxes(automargin=True)
         return fig 
 
     elif detail == 'dep':
-        fig = px.bar(df, y="Fédération", x="nb_licencies", orientation='h', width=1000, height=graph_height, text_auto=True, color_discrete_sequence=['#2633b0'])
+        fig = px.bar(df, y="Fédération", x="nb_licencies", orientation='h', width=1000, height=graph_height, text_auto=True, color_discrete_sequence=['#27474E'])
         fig.update_layout(title = f"Nb total de licenciés par fédération dans le département")
         fig.update_xaxes(automargin=True)
         return fig 
 
     elif detail == 'france':
-        fig = px.bar(df, y="Fédération", x="nb_licencies", orientation='h', width=1000, height=graph_height, text_auto=True, color_discrete_sequence=['#2633b0'])
+        fig = px.bar(df, y="Fédération", x="nb_licencies", orientation='h', width=1000, height=graph_height, text_auto=True, color_discrete_sequence=['#27474E'])
         fig.update_layout(title = f"Nb total de licenciés par fédération en France")
         fig.update_xaxes(automargin=True)
         return fig 

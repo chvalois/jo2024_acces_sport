@@ -555,27 +555,29 @@ def display_joyplot(df):
 
     sns.set_theme(style="white", rc={"axes.facecolor": (0, 0, 0, 0)})
 
-    # Initialize the FacetGrid object
-    pal = sns.cubehelix_palette(len(df['Fédération'].unique()), hue=1)
+    # Initialisation de l'objet FacetGrid
+    nb_fed = len(df['Fédération'].unique())
+    pal = sns.cubehelix_palette(nb_fed, hue=1)
+
     g = sns.FacetGrid(df, row="Fédération", hue="Fédération", aspect=20, height=0.5, palette=pal)
 
-    # Draw the line plots
+    # Dessin des lineplots
     g.map(sns.lineplot, "age_x", "pct_value", linewidth=1)
 
-    # Function to fill the area under each line
+    # Fonction pour remplir la zone sous le trait des graphiques
     def fill_under_lines(data, **kwargs):
         ax = plt.gca()
         for line in ax.lines:
             x, y = line.get_xydata().T
             ax.fill_between(x, 0, y, alpha=0.4, color=line.get_color())
 
-    # Apply the fill_under_lines function to each subplot
+    # Application de la fonction
     g.map_dataframe(fill_under_lines)
 
-    # Add reference lines
+    # Ajout des lignes de référence
     g.refline(y=0, linewidth=2, linestyle="-", color=None, clip_on=False)
 
-    # Define and use a simple function to label the plot in axes coordinates
+    # Fonction pour ajouter un label à chaque subplot
     def label(x, color, label):
         ax = plt.gca()
         ax.text(-.5, .2, label, fontweight="bold", color=color,
@@ -583,21 +585,20 @@ def display_joyplot(df):
 
     g.map(label, "age_x")
 
-    # Set the subplots to overlap
+    # Réglage de l'overlap des subplots
     g.figure.subplots_adjust(hspace=-.6)
 
-    # Add a title
+    # Ajout du titre
     plt.suptitle("Répartition des licenciés par âge", fontsize=16, y=0.9)
 
-    # Set x-axis and y-axis labels
+    # Labels des axes
     g.set_axis_labels("Âge", "%")
 
-    # Remove axes details that don't play well with overlap
+    # Retrait des détails des axes
     g.set_titles("")
     g.set(yticks=[], ylabel="")
     g.despine(bottom=True, left=True)
 
-    # Show the plot
     return plt
 
 

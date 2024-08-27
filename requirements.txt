@@ -10,9 +10,3 @@ seaborn
 streamlit
 streamlit_folium
 streamlit-option-menu
-
-# sudo apt install python3 python3-venv python3-pip
-# python3 -m venv venv
-# Command Line to install ipykernel on venv : python3 -m ipykernel install --user --name=venv
-# pip install -r requirements.txt
-# Lancer serveur via command: jupyter notebook, puis utiliser le kernel dans VS Code à partir de l'URL du serveur jupyter

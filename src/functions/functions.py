@@ -7,6 +7,8 @@ import zipfile
 import os
 import streamlit as st
 import unicodedata
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 ###### ----- Fonctions de transformation de données ----- ######
 
@@ -294,6 +296,61 @@ def get_lic_stat_df(fed):
     return df
 
 
+def w_avg(df, values, weights):
+    d = df[values]
+    w = df[weights]
+    return (d * w).sum() / w.sum()
+
+
+def get_df_licencies_age_joyplot(dep, qpv):
+    """
+    Créé un dataframe pour affichage d'un joyplot - réparation des licenciés par âge pour chaque fédération
+
+    Paramètres
+    -------
+    dep : str | 
+    qpv : boolean | 
+
+    Retourne
+    -------
+    df : pd.Dataframe
+    """
+    
+    df = pd.read_parquet('data/transformed/lic-data-2021_details_agg.parquet')
+
+    fed_to_exclude = ["F Sportive Educative de l'Enseignement Catholique (UGSEL)",
+                  'Union Nationale du Sport Scolaire (UNSS)',
+                  "Union Sportive de l'Enseignement du Premier Degré"]
+        
+    if dep != 'Tous les départements':
+        df = df[df['Département'] == dep]
+
+    df = df[~df['Fédération'].isin(fed_to_exclude)]
+    top_fed = df.groupby('Fédération')['value'].sum().reset_index().sort_values(by = 'value', ascending = False).head(20)['Fédération'].to_list()
+
+    df = df[df['Fédération'].isin(top_fed)]
+    if qpv == True:
+        df = df[df['QPV_or_not'] == True]
+    else:
+        df = df[df['QPV_or_not'] == False]
+
+    df['age_x'] = df['age'].apply(lambda x: x[:2])
+
+    df = df.groupby(['Fédération', 'age_x'])['value'].sum().reset_index()
+    df['age_x'] = df['age_x'].astype(int)
+
+    df_avg_age = df.groupby('Fédération').apply(w_avg, 'age_x', 'value').reset_index().rename(columns = {0: 'avg_w_age'})
+    df = df.merge(df_avg_age, on = 'Fédération', how = 'left')
+    df = df.sort_values(by = ['avg_w_age', 'age_x'])
+
+    # Normalisation des valeurs pour obtenir une répartition par âge pour chaque fédération
+    df['total_value'] = df.groupby('Fédération')['value'].transform('sum')
+    df['pct_value'] = (df['value'] / df['total_value']) * 100
+    df.drop(columns='total_value', inplace=True)
+
+    return df
+
+
 
 ###### ----- Fonctions d'affichage d'attributs streamlit ----- ######
 
@@ -483,9 +540,65 @@ def display_barh(stat, dep, qpv):
 
     return(fig)
 
+def display_joyplot(df):
+    """
+    Renvoie un graphique Seaborn
 
+    Paramètres
+    -------
+    df : pd.Dataframe |
+    
+    Retourne
+    -------
+    fig : px.fig | Graphique Seaborn de type "Joyplot"
+    """
 
+    sns.set_theme(style="white", rc={"axes.facecolor": (0, 0, 0, 0)})
 
+    # Initialize the FacetGrid object
+    pal = sns.cubehelix_palette(len(df['Fédération'].unique()), hue=1)
+    g = sns.FacetGrid(df, row="Fédération", hue="Fédération", aspect=20, height=0.5, palette=pal)
+
+    # Draw the line plots
+    g.map(sns.lineplot, "age_x", "pct_value", linewidth=1)
+
+    # Function to fill the area under each line
+    def fill_under_lines(data, **kwargs):
+        ax = plt.gca()
+        for line in ax.lines:
+            x, y = line.get_xydata().T
+            ax.fill_between(x, 0, y, alpha=0.4, color=line.get_color())
+
+    # Apply the fill_under_lines function to each subplot
+    g.map_dataframe(fill_under_lines)
+
+    # Add reference lines
+    g.refline(y=0, linewidth=2, linestyle="-", color=None, clip_on=False)
+
+    # Define and use a simple function to label the plot in axes coordinates
+    def label(x, color, label):
+        ax = plt.gca()
+        ax.text(-.5, .2, label, fontweight="bold", color=color,
+                ha="left", va="center", transform=ax.transAxes, size=10)
+
+    g.map(label, "age_x")
+
+    # Set the subplots to overlap
+    g.figure.subplots_adjust(hspace=-.6)
+
+    # Add a title
+    plt.suptitle("Répartition des licenciés par âge", fontsize=16, y=0.9)
+
+    # Set x-axis and y-axis labels
+    g.set_axis_labels("Âge", "%")
+
+    # Remove axes details that don't play well with overlap
+    g.set_titles("")
+    g.set(yticks=[], ylabel="")
+    g.despine(bottom=True, left=True)
+
+    # Show the plot
+    return plt
 
 
 

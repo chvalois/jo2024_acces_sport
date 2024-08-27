@@ -31,6 +31,10 @@ def comment_utiliser(data_freshness):
         st.image('resources/demo/fed_populaires_nb_sup_60.png')
 
 
+    st.write("Il serait également intéressant de consulter la répartition des licenciés par âge sur les plus importantes fédérations sportives dans le département 59 par exemple : ")
+    st.image('resources/demo/joyplot_59.png')
+
+
     st.divider()
     
     st.subheader("Dans quel département le % de bassins de natation est-il le moins pourvu d’accès handicapés ?")

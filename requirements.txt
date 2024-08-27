@@ -6,6 +6,7 @@ polars
 pyarrow
 branca
 plotly
+seaborn
 streamlit
 streamlit_folium
 streamlit-option-menu

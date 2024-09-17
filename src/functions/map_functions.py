@@ -76,8 +76,8 @@ def display_france_map(fed, stat, title):
         columns=['id', col_to_display[stat]],
         key_on='feature.properties.id',
         fill_color='YlOrRd',
-        fill_opacity=0.7,
-        line_opacity=0.1,
+        fill_opacity=0.9,
+        line_opacity=0.5,
         line_weight=0.5,
         legend_name=col_to_display[stat]
     ).add_to(m)
@@ -255,8 +255,8 @@ def display_france_equip_map(equip_list, stat, title):
         columns=['id', col_to_display],
         key_on='feature.properties.id',
         fill_color='YlOrRd',
-        fill_opacity=0.7,
-        line_opacity=0.1,
+        fill_opacity=0.9,
+        line_opacity=0.5,
         line_weight=0.5,
         legend_name=stat
     ).add_to(m)
@@ -384,8 +384,8 @@ def get_map(sport, dep, map_type, marker_type, title):
         columns=['id', heatmap_field],
         key_on='feature.properties.id',
         fill_color='YlOrRd',
-        fill_opacity=0.7,
-        line_opacity=0.1,
+        fill_opacity=0.9,
+        line_opacity=0.5,
         line_weight=0.5,
         legend_name=heatmap_field
     ).add_to(m)
@@ -499,8 +499,8 @@ def get_a_map(dep, map_type, df_equip_f, cities_f, marker_type, title):
         columns=['id', heatmap_field],
         key_on='feature.properties.id',
         fill_color='YlOrRd',
-        fill_opacity=0.7,
-        line_opacity=0.1,
+        fill_opacity=0.9,
+        line_opacity=0.5,
         line_weight=0.5,
         legend_name=heatmap_field
     ).add_to(m)
@@ -711,8 +711,8 @@ def get_map_allsports(sport_list, dep, commune_list, stat):
         columns=['id', heatmap_field],
         key_on='feature.properties.id',
         fill_color='YlOrRd',
-        fill_opacity=0.7,
-        line_opacity=0.1,
+        fill_opacity=0.9,
+        line_opacity=0.5,
         line_weight=0.5,
         legend_name=heatmap_field
     ).add_to(m)
